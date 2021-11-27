@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "battlefield"
+name = "battleship"
 version = "1.0.0"
 dependencies = [
  "rand",
