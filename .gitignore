@@ -1,0 +1,11 @@
+# os/env
+.DS_Store
+.DS_Store?
+.env
+
+# rust
+target/*
+
+# editor
+*.sublime-project
+*.sublime-workspace
