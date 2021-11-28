@@ -6,3 +6,4 @@ authors = ["Dominik Wilkowski <Hi@Dominik-Wilkowski.com>"]
 
 [dependencies]
 rand = "0.8.4"
+termion = "1.5.6"

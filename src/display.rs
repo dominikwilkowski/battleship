@@ -1,29 +1,40 @@
+use crate::Cell;
+use Cell::{Damage, Empty, Ship, Shot};
+
+enum Board {
+	Human,
+	Ai,
+}
+
 // return one line of a board and interpret states to visual styles
-fn get_board_line(board: [u8; 10]) -> String {
+fn get_board_line(board: &[Cell; 10], hide_ships: Board) -> String {
 	let mut output = String::new();
 
 	for i in 0..10 {
-		if board[i] == 0 {
-			output += "░░░";
-		} else if board[i] == 1 {
-			output += " ◌ ";
-		} else if board[i] == 2 {
-			output += "▓▓▓";
-		} else if board[i] == 3 {
-			output += "╳╳╳";
+		match board[i] {
+			Empty => output += "░░░",
+			Shot => output += " ◌ ",
+			Ship => {
+				match hide_ships {
+					// we hide ships if we're looking at the AIs board
+					Board::Human => output += "▓▓▓",
+					Board::Ai => output += "░░░",
+				}
+			}
+			Damage => output += "╳╳╳",
 		}
 	}
 
 	output
 }
 
-pub fn draw(board_me: [[u8; 10]; 10], board_ai: [[u8; 10]; 10]) {
+pub fn draw(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> String {
 	let logo = concat!(
-		" ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓\n",
-		" ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\n",
-		" ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\n",
-		" ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\n",
-		" ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\n",
+		" ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓\r\n",
+		" ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n",
+		" ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n",
+		" ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n",
+		" ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n",
 		"                                           ┗┛"
 	);
 	let names = "Me                                 ║  AI";
@@ -33,13 +44,20 @@ pub fn draw(board_me: [[u8; 10]; 10], board_ai: [[u8; 10]; 10]) {
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
 	let space_bottom = "                                   ║";
 
-	println!("{}\n\n{}\n{}\n{}", logo, names, coord_top, frame_top);
+	let mut output = format!("{}\r\n\r\n{}\r\n{}\r\n{}\r\n", logo, names, coord_top, frame_top);
 	for i in 0..10 {
-		print!("{}│", coord_dict[i]);
-		print!("{}", get_board_line(board_me[i]));
-		print!("│  ║  {}│", coord_dict[i]);
-		print!("{}", get_board_line(board_ai[i]));
-		print!("│\n");
+		output += coord_dict[i];
+		output += "│";
+		output += &get_board_line(&board_me[i], Board::Human);
+		output += "│  ║  ";
+		output += coord_dict[i];
+		output += "│";
+		output += &get_board_line(&board_ai[i], Board::Ai);
+		output += "│\r\n";
 	}
-	println!("{}\n{}", frame_bottom, space_bottom);
+	output += frame_bottom;
+	output += "\r\n";
+	output += space_bottom;
+
+	output
 }
