@@ -100,3 +100,7 @@ pub fn draw_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Str
 
 	output
 }
+
+pub fn draw_round1_instructions() -> String {
+	String::from("\r\n Arrow keys to position │ [r] rotate │ [Enter] place │ [q] Quit\r\n")
+}

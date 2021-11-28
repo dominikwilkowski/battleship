@@ -52,21 +52,25 @@ fn main() {
 		[Empty, Empty, Ship, Empty, Empty, Empty, Ship, Ship, Empty, Empty],
 	];
 
-	let header = display::draw_header();
-	let headerHeight: u16 = (header.lines().count() + 2).try_into().unwrap();
 	let mut pos_x = 0;
 	let mut pos_y = 0;
 
 	board_me[pos_y][pos_x] = Placeholder;
 
+	let header = display::draw_header();
+	let header_height: u16 = (header.lines().count() + 2).try_into().unwrap();
+	let board = display::draw_board(board_me, board_ai);
+	let board_height: u16 = (board.lines().count() + 2).try_into().unwrap();
+
 	write!(
 		stdout,
-		"{}{}{}{}{}\r\n{}",
+		"{}{}{}{}{}{}\r\n{}",
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
 		header,
-		display::draw_board(board_me, board_ai),
+		board,
+		display::draw_round1_instructions(),
 		termion::cursor::Save
 	)
 	.unwrap();
@@ -98,10 +102,11 @@ fn main() {
 
 				write!(
 					stdout,
-					"{}{}{}{}",
-					termion::cursor::Goto(1, headerHeight),
+					"{}{}{}{}{}",
+					termion::cursor::Goto(1, header_height),
 					termion::clear::AfterCursor,
 					display::draw_board(board_me, board_ai),
+					display::draw_round1_instructions(),
 					termion::cursor::Restore,
 				)
 				.unwrap();
@@ -116,10 +121,11 @@ fn main() {
 
 				write!(
 					stdout,
-					"{}{}{}{}",
-					termion::cursor::Goto(1, headerHeight),
+					"{}{}{}{}{}",
+					termion::cursor::Goto(1, header_height),
 					termion::clear::AfterCursor,
 					display::draw_board(board_me, board_ai),
+					display::draw_round1_instructions(),
 					termion::cursor::Restore,
 				)
 				.unwrap();
@@ -135,10 +141,11 @@ fn main() {
 
 				write!(
 					stdout,
-					"{}{}{}{}",
-					termion::cursor::Goto(1, headerHeight),
+					"{}{}{}{}{}",
+					termion::cursor::Goto(1, header_height),
 					termion::clear::AfterCursor,
 					display::draw_board(board_me, board_ai),
+					display::draw_round1_instructions(),
 					termion::cursor::Restore,
 				)
 				.unwrap();
@@ -153,10 +160,11 @@ fn main() {
 
 				write!(
 					stdout,
-					"{}{}{}{}",
-					termion::cursor::Goto(1, headerHeight),
+					"{}{}{}{}{}",
+					termion::cursor::Goto(1, header_height),
 					termion::clear::AfterCursor,
 					display::draw_board(board_me, board_ai),
+					display::draw_round1_instructions(),
 					termion::cursor::Restore,
 				)
 				.unwrap();
