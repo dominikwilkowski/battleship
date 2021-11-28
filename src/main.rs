@@ -1,7 +1,8 @@
 extern crate rand;
 extern crate termion;
 
-mod display;
+pub mod config;
+mod gui;
 
 use std::io::{stdin, stdout, Write};
 use termion::event::Key;
@@ -57,20 +58,20 @@ fn main() {
 
 	board_me[pos_y][pos_x] = Placeholder;
 
-	let header = display::draw_header();
+	let header = gui::get_header();
 	let header_height: u16 = (header.lines().count() + 2).try_into().unwrap();
-	let board = display::draw_board(board_me, board_ai);
+	let board = gui::get_board(board_me, board_ai);
 	let board_height: u16 = (board.lines().count() + 2).try_into().unwrap();
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}\r\n{}",
+		"{}{}{}{}{}{}{}",
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
 		header,
 		board,
-		display::draw_round1_instructions(),
+		gui::get_round1_instructions(),
 		termion::cursor::Save
 	)
 	.unwrap();
@@ -78,19 +79,13 @@ fn main() {
 	stdout.flush().unwrap();
 
 	for c in stdin.keys() {
-		write!(
-			stdout,
-			"\r\n{}{}",
-			termion::cursor::Restore,
-			termion::clear::CurrentLine
-		)
-		.unwrap();
+		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
 
 		match c.unwrap() {
 			Key::Char('q') => break,
-			Key::Alt(_) => break,
 			Key::Esc => break,
-			Key::Char('h') => println!("←"),
+			Key::Char('r') => println!("ROTATE"),
+			Key::Char('\n') => println!("ENTER"),
 			Key::Left => {
 				board_me[pos_y][pos_x] = Empty;
 				if pos_x == 0 {
@@ -99,17 +94,6 @@ fn main() {
 					pos_x -= 1;
 				}
 				board_me[pos_y][pos_x] = Placeholder;
-
-				write!(
-					stdout,
-					"{}{}{}{}{}",
-					termion::cursor::Goto(1, header_height),
-					termion::clear::AfterCursor,
-					display::draw_board(board_me, board_ai),
-					display::draw_round1_instructions(),
-					termion::cursor::Restore,
-				)
-				.unwrap();
 			}
 			Key::Right => {
 				board_me[pos_y][pos_x] = Empty;
@@ -118,17 +102,6 @@ fn main() {
 					pos_x = 9;
 				}
 				board_me[pos_y][pos_x] = Placeholder;
-
-				write!(
-					stdout,
-					"{}{}{}{}{}",
-					termion::cursor::Goto(1, header_height),
-					termion::clear::AfterCursor,
-					display::draw_board(board_me, board_ai),
-					display::draw_round1_instructions(),
-					termion::cursor::Restore,
-				)
-				.unwrap();
 			}
 			Key::Up => {
 				board_me[pos_y][pos_x] = Empty;
@@ -138,17 +111,6 @@ fn main() {
 					pos_y -= 1;
 				}
 				board_me[pos_y][pos_x] = Placeholder;
-
-				write!(
-					stdout,
-					"{}{}{}{}{}",
-					termion::cursor::Goto(1, header_height),
-					termion::clear::AfterCursor,
-					display::draw_board(board_me, board_ai),
-					display::draw_round1_instructions(),
-					termion::cursor::Restore,
-				)
-				.unwrap();
 			}
 			Key::Down => {
 				board_me[pos_y][pos_x] = Empty;
@@ -157,21 +119,20 @@ fn main() {
 					pos_y = 9;
 				}
 				board_me[pos_y][pos_x] = Placeholder;
-
-				write!(
-					stdout,
-					"{}{}{}{}{}",
-					termion::cursor::Goto(1, header_height),
-					termion::clear::AfterCursor,
-					display::draw_board(board_me, board_ai),
-					display::draw_round1_instructions(),
-					termion::cursor::Restore,
-				)
-				.unwrap();
 			}
-			Key::Char('\n') => println!("Enter"),
 			_ => {}
 		}
+
+		write!(
+			stdout,
+			"{}{}{}{}{}",
+			termion::cursor::Goto(1, header_height),
+			termion::clear::AfterCursor,
+			gui::get_board(board_me, board_ai),
+			gui::get_round1_instructions(),
+			termion::cursor::Restore,
+		)
+		.unwrap();
 		stdout.flush().unwrap();
 	}
 
