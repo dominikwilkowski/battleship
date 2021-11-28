@@ -8,7 +8,7 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use Cell::{Damage, Empty, Ship, Shot};
+use Cell::{Damage, Empty, Placeholder, Ship, Shot};
 
 #[derive(Copy, Clone, Debug)]
 pub enum Cell {
@@ -16,27 +16,28 @@ pub enum Cell {
 	Shot,
 	Ship,
 	Damage,
+	Placeholder,
 }
 
 fn main() {
 	let stdin = stdin();
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
-	// let mut board_me = [[Cell::Empty; 10]; 10];
+	let mut board_me = [[Cell::Empty; 10]; 10];
 	// let mut board_ai = [[Cell::Empty; 10]; 10];
 
-	let mut board_me = [
-		[Shot, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty],
-		[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Ship, Ship, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
-	];
+	// let mut board_me = [
+	// 	[Shot, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty],
+	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Ship, Ship, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
+	// ];
 
 	let mut board_ai = [
 		[Shot, Ship, Ship, Ship, Empty, Empty, Empty, Empty, Empty, Empty],
@@ -51,15 +52,21 @@ fn main() {
 		[Empty, Empty, Ship, Empty, Empty, Empty, Ship, Ship, Empty, Empty],
 	];
 
-	let screen = display::draw(board_me, board_ai);
+	let header = display::draw_header();
+	let headerHeight: u16 = (header.lines().count() + 2).try_into().unwrap();
+	let mut pos_x = 0;
+	let mut pos_y = 0;
+
+	board_me[pos_y][pos_x] = Placeholder;
 
 	write!(
 		stdout,
-		"{}{}{}{}\r\n{}",
+		"{}{}{}{}{}\r\n{}",
 		termion::clear::All,
-		termion::cursor::Goto(1, 1),
+		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
-		screen,
+		header,
+		display::draw_board(board_me, board_ai),
 		termion::cursor::Save
 	)
 	.unwrap();
@@ -79,10 +86,81 @@ fn main() {
 			Key::Char('q') => break,
 			Key::Alt(_) => break,
 			Key::Esc => break,
-			Key::Left => println!("←"),
-			Key::Right => println!("→"),
-			Key::Up => println!("↑"),
-			Key::Down => println!("↓"),
+			Key::Char('h') => println!("←"),
+			Key::Left => {
+				board_me[pos_y][pos_x] = Empty;
+				if pos_x == 0 {
+					pos_x = 0;
+				} else {
+					pos_x -= 1;
+				}
+				board_me[pos_y][pos_x] = Placeholder;
+
+				write!(
+					stdout,
+					"{}{}{}{}",
+					termion::cursor::Goto(1, headerHeight),
+					termion::clear::AfterCursor,
+					display::draw_board(board_me, board_ai),
+					termion::cursor::Restore,
+				)
+				.unwrap();
+			}
+			Key::Right => {
+				board_me[pos_y][pos_x] = Empty;
+				pos_x += 1;
+				if pos_x > 9 {
+					pos_x = 9;
+				}
+				board_me[pos_y][pos_x] = Placeholder;
+
+				write!(
+					stdout,
+					"{}{}{}{}",
+					termion::cursor::Goto(1, headerHeight),
+					termion::clear::AfterCursor,
+					display::draw_board(board_me, board_ai),
+					termion::cursor::Restore,
+				)
+				.unwrap();
+			}
+			Key::Up => {
+				board_me[pos_y][pos_x] = Empty;
+				if pos_y == 0 {
+					pos_y = 0;
+				} else {
+					pos_y -= 1;
+				}
+				board_me[pos_y][pos_x] = Placeholder;
+
+				write!(
+					stdout,
+					"{}{}{}{}",
+					termion::cursor::Goto(1, headerHeight),
+					termion::clear::AfterCursor,
+					display::draw_board(board_me, board_ai),
+					termion::cursor::Restore,
+				)
+				.unwrap();
+			}
+			Key::Down => {
+				board_me[pos_y][pos_x] = Empty;
+				pos_y += 1;
+				if pos_y > 9 {
+					pos_y = 9;
+				}
+				board_me[pos_y][pos_x] = Placeholder;
+
+				write!(
+					stdout,
+					"{}{}{}{}",
+					termion::cursor::Goto(1, headerHeight),
+					termion::clear::AfterCursor,
+					display::draw_board(board_me, board_ai),
+					termion::cursor::Restore,
+				)
+				.unwrap();
+			}
 			Key::Char('\n') => println!("Enter"),
 			_ => {}
 		}
