@@ -117,6 +117,13 @@ fn keep_track_of_ships() {
 	assert_eq!(ship_slice.three_block, vec![[0, 0, 0]]);
 	assert_eq!(ships.get_next_unset_ship(), ("two_block", 0));
 
+	ships.set_ship("one_block", 3, [11, 11]);
+	ship_slice = ships.get_ships();
+	assert_eq!(ship_slice.one_block, vec![[3, 8, 1], [5, 5, 1], [1, 1, 1]]);
+	assert_eq!(ship_slice.two_block, vec![[0, 0, 0], [0, 0, 0]]);
+	assert_eq!(ship_slice.three_block, vec![[0, 0, 0]]);
+	assert_eq!(ships.get_next_unset_ship(), ("two_block", 0));
+
 	ships.set_ship("two_block", 0, [2, 2]);
 	ship_slice = ships.get_ships();
 	assert_eq!(ship_slice.one_block, vec![[3, 8, 1], [5, 5, 1], [1, 1, 1]]);
@@ -131,7 +138,21 @@ fn keep_track_of_ships() {
 	assert_eq!(ship_slice.three_block, vec![[0, 0, 0]]);
 	assert_eq!(ships.get_next_unset_ship(), ("three_block", 0));
 
+	ships.set_ship("two_block", 2, [11, 11]);
+	ship_slice = ships.get_ships();
+	assert_eq!(ship_slice.one_block, vec![[3, 8, 1], [5, 5, 1], [1, 1, 1]]);
+	assert_eq!(ship_slice.two_block, vec![[2, 2, 1], [9, 9, 1]]);
+	assert_eq!(ship_slice.three_block, vec![[0, 0, 0]]);
+	assert_eq!(ships.get_next_unset_ship(), ("three_block", 0));
+
 	ships.set_ship("three_block", 0, [7, 7]);
+	ship_slice = ships.get_ships();
+	assert_eq!(ship_slice.one_block, vec![[3, 8, 1], [5, 5, 1], [1, 1, 1]]);
+	assert_eq!(ship_slice.two_block, vec![[2, 2, 1], [9, 9, 1]]);
+	assert_eq!(ship_slice.three_block, vec![[7, 7, 1]]);
+	assert_eq!(ships.get_next_unset_ship(), ("", -1));
+
+	ships.set_ship("three_block", 1, [11, 11]);
 	ship_slice = ships.get_ships();
 	assert_eq!(ship_slice.one_block, vec![[3, 8, 1], [5, 5, 1], [1, 1, 1]]);
 	assert_eq!(ship_slice.two_block, vec![[2, 2, 1], [9, 9, 1]]);
