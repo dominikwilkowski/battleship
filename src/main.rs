@@ -3,7 +3,9 @@ extern crate termion;
 
 pub mod config;
 mod gui;
+mod ships;
 
+use ships::Ships;
 use std::io::{stdin, stdout, Write};
 use termion::event::Key;
 use termion::input::TermRead;
@@ -25,7 +27,7 @@ fn main() {
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
 	let mut board_me = [[Cell::Empty; 10]; 10];
-	// let mut board_ai = [[Cell::Empty; 10]; 10];
+	let mut board_ai = [[Cell::Empty; 10]; 10];
 
 	// let mut board_me = [
 	// 	[Shot, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
@@ -40,18 +42,25 @@ fn main() {
 	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
 	// ];
 
-	let mut board_ai = [
-		[Shot, Ship, Ship, Ship, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty, Empty],
-		[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-		[Empty, Empty, Ship, Empty, Empty, Empty, Ship, Ship, Empty, Empty],
-	];
+	// let mut board_ai = [
+	// 	[Shot, Ship, Ship, Ship, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Ship, Ship, Empty, Empty],
+	// ];
+
+	let mut ships = Ships::new(
+		config::SHIP_1_BLOCK_AMOUNT,
+		config::SHIP_2_BLOCK_AMOUNT,
+		config::SHIP_3_BLOCK_AMOUNT,
+	);
+	let (kind, index) = ships.get_next_unset_ship();
 
 	let mut pos_x = 0;
 	let mut pos_y = 0;
@@ -78,10 +87,10 @@ fn main() {
 
 	stdout.flush().unwrap();
 
-	for c in stdin.keys() {
+	for key in stdin.keys() {
 		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
 
-		match c.unwrap() {
+		match key.unwrap() {
 			Key::Char('q') => break,
 			Key::Esc => break,
 			Key::Char('r') => println!("ROTATE"),
