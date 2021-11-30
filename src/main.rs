@@ -13,7 +13,7 @@ use termion::raw::IntoRawMode;
 
 use Cell::{Damage, Empty, Placeholder, Ship, Shot};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Cell {
 	Empty,
 	Shot,
@@ -22,51 +22,52 @@ pub enum Cell {
 	Placeholder,
 }
 
+#[derive(Copy, Clone, Debug)]
+enum Rotation {
+	Horizontal,
+	Vertical,
+}
+
+#[derive(Copy, Clone, Debug)]
+enum Direction {
+	Left,
+	Right,
+	Up,
+	Down,
+}
+
 fn main() {
 	let stdin = stdin();
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
-	let mut board_me = [[Cell::Empty; 10]; 10];
-	let mut board_ai = [[Cell::Empty; 10]; 10];
+	// our boards
+	let mut board_me = [[Empty; 10]; 10];
+	let mut board_ai = [[Empty; 10]; 10];
 
-	// let mut board_me = [
-	// 	[Shot, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty],
-	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Ship, Ship, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
-	// ];
-
-	// let mut board_ai = [
-	// 	[Shot, Ship, Ship, Ship, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Shot, Empty, Empty, Ship, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Ship, Ship, Empty, Empty],
-	// ];
-
+	// the ships to be placed
 	let mut ships = Ships::new(
-		config::SHIP_1_BLOCK_AMOUNT,
-		config::SHIP_2_BLOCK_AMOUNT,
-		config::SHIP_3_BLOCK_AMOUNT,
+		config::SHIP_ONE_BLOCK_AMOUNT,
+		config::SHIP_TWO_BLOCK_AMOUNT,
+		config::SHIP_THREE_BLOCK_AMOUNT,
 	);
 	let (kind, index) = ships.get_next_unset_ship();
+	let mut ship_size = config::get_entitie_size(kind);
 
-	let mut pos_x = 0;
-	let mut pos_y = 0;
+	// rotation of our ship
+	let mut rotation = Rotation::Horizontal;
 
-	board_me[pos_y][pos_x] = Placeholder;
+	// our current position on the board
+	let mut pos_x: usize = 0;
+	let mut pos_y: usize = 0;
 
+	// the boundary of our board depending on the size of the current ship
+	let mut max_x: usize = get_max_x(&rotation, &ship_size);
+	let mut max_y: usize = get_max_y(&rotation, &ship_size);
+
+	// placing our first ship
+	board_me = place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+
+	// GUI
 	let header = gui::get_header();
 	let header_height: u16 = (header.lines().count() + 2).try_into().unwrap();
 	let board = gui::get_board(board_me, board_ai);
@@ -93,41 +94,76 @@ fn main() {
 		match key.unwrap() {
 			Key::Char('q') => break,
 			Key::Esc => break,
-			Key::Char('r') => println!("ROTATE"),
+			Key::Char('r') => {
+				match rotation {
+					Rotation::Horizontal => {
+						rotation = Rotation::Vertical;
+					}
+					Rotation::Vertical => {
+						rotation = Rotation::Horizontal;
+					}
+				};
+			}
 			Key::Char('\n') => println!("ENTER"),
 			Key::Left => {
-				board_me[pos_y][pos_x] = Empty;
-				if pos_x == 0 {
-					pos_x = 0;
-				} else {
-					pos_x -= 1;
-				}
-				board_me[pos_y][pos_x] = Placeholder;
+				let (board_new, pos_x_new, pos_y_new) = move_ship(
+					board_me,
+					pos_x,
+					pos_y,
+					&max_x,
+					&max_y,
+					rotation,
+					ship_size,
+					Direction::Left,
+				);
+				board_me = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
 			}
 			Key::Right => {
-				board_me[pos_y][pos_x] = Empty;
-				pos_x += 1;
-				if pos_x > 9 {
-					pos_x = 9;
-				}
-				board_me[pos_y][pos_x] = Placeholder;
+				let (board_new, pos_x_new, pos_y_new) = move_ship(
+					board_me,
+					pos_x,
+					pos_y,
+					&max_x,
+					&max_y,
+					rotation,
+					ship_size,
+					Direction::Right,
+				);
+				board_me = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
 			}
 			Key::Up => {
-				board_me[pos_y][pos_x] = Empty;
-				if pos_y == 0 {
-					pos_y = 0;
-				} else {
-					pos_y -= 1;
-				}
-				board_me[pos_y][pos_x] = Placeholder;
+				let (board_new, pos_x_new, pos_y_new) = move_ship(
+					board_me,
+					pos_x,
+					pos_y,
+					&max_x,
+					&max_y,
+					rotation,
+					ship_size,
+					Direction::Up,
+				);
+				board_me = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
 			}
 			Key::Down => {
-				board_me[pos_y][pos_x] = Empty;
-				pos_y += 1;
-				if pos_y > 9 {
-					pos_y = 9;
-				}
-				board_me[pos_y][pos_x] = Placeholder;
+				let (board_new, pos_x_new, pos_y_new) = move_ship(
+					board_me,
+					pos_x,
+					pos_y,
+					&max_x,
+					&max_y,
+					rotation,
+					ship_size,
+					Direction::Down,
+				);
+				board_me = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
 			}
 			_ => {}
 		}
@@ -146,4 +182,326 @@ fn main() {
 	}
 
 	write!(stdout, "{}", termion::cursor::Show).unwrap();
+}
+
+fn move_ship<'a>(
+	mut board: [[Cell; 10]; 10],
+	mut pos_x: usize,
+	mut pos_y: usize,
+	max_x: &usize,
+	max_y: &usize,
+	rotation: Rotation,
+	ship_size: usize,
+	direction: Direction,
+) -> ([[Cell; 10]; 10], usize, usize) {
+	match direction {
+		Direction::Left => {
+			// clear previous position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+			pos_x = match pos_x {
+				0 => 0,
+				_ => pos_x - 1,
+			};
+			// set new position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+		}
+		Direction::Right => {
+			// clear previous position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+			pos_x = match pos_x {
+				pos if pos >= *max_x => *max_x,
+				_ => pos_x + 1,
+			};
+			// set new position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+		}
+		Direction::Up => {
+			// clear previous position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+			pos_y = match pos_y {
+				0 => 0,
+				_ => pos_y - 1,
+			};
+			// set new position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+		}
+		Direction::Down => {
+			// clear previous position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+			pos_y = match pos_y {
+				pos if pos >= *max_y => *max_y,
+				_ => pos_y + 1,
+			};
+			// set new position
+			board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+		}
+	};
+
+	(board, pos_x, pos_y)
+}
+
+fn place_ship(
+	mut board: [[Cell; 10]; 10],
+	mut pos_x: usize,
+	mut pos_y: usize,
+	rotation: &Rotation,
+	ship_size: &usize,
+	cell: Cell,
+) -> [[Cell; 10]; 10] {
+	match rotation {
+		Rotation::Horizontal => {
+			for offset in 0..*ship_size {
+				board[pos_y][pos_x + offset] = cell;
+			}
+		}
+		Rotation::Vertical => {
+			for offset in 0..*ship_size {
+				board[pos_y + offset][pos_x] = cell;
+			}
+		}
+	}
+
+	board
+}
+
+#[test]
+fn place_ship_works() {
+	let mut result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &1, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+
+	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &2, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+
+	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &3, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Placeholder,
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+
+	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &1, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+
+	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &2, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+
+	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &3, Placeholder);
+	assert_eq!(
+		result,
+		[
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[
+				Placeholder,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty,
+				Empty
+			],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+			[Empty; 10],
+		]
+	);
+}
+
+fn get_max_x(rotation: &Rotation, ship_size: &usize) -> usize {
+	match rotation {
+		Rotation::Horizontal => 9 - ship_size + 1,
+		Rotation::Vertical => 9,
+	}
+}
+
+#[test]
+fn get_max_x_works() {
+	assert_eq!(get_max_x(&Rotation::Horizontal, &1), 9);
+	assert_eq!(get_max_x(&Rotation::Horizontal, &2), 8);
+	assert_eq!(get_max_x(&Rotation::Horizontal, &3), 7);
+	assert_eq!(get_max_x(&Rotation::Horizontal, &4), 6);
+	assert_eq!(get_max_x(&Rotation::Vertical, &1), 9);
+	assert_eq!(get_max_x(&Rotation::Vertical, &2), 9);
+	assert_eq!(get_max_x(&Rotation::Vertical, &3), 9);
+	assert_eq!(get_max_x(&Rotation::Vertical, &4), 9);
+}
+
+fn get_max_y(rotation: &Rotation, ship_size: &usize) -> usize {
+	match rotation {
+		Rotation::Horizontal => 9,
+		Rotation::Vertical => 9 - ship_size + 1,
+	}
+}
+
+#[test]
+fn get_max_y_works() {
+	assert_eq!(get_max_y(&Rotation::Vertical, &1), 9);
+	assert_eq!(get_max_y(&Rotation::Vertical, &2), 8);
+	assert_eq!(get_max_y(&Rotation::Vertical, &3), 7);
+	assert_eq!(get_max_y(&Rotation::Vertical, &4), 6);
+	assert_eq!(get_max_y(&Rotation::Horizontal, &1), 9);
+	assert_eq!(get_max_y(&Rotation::Horizontal, &2), 9);
+	assert_eq!(get_max_y(&Rotation::Horizontal, &3), 9);
+	assert_eq!(get_max_y(&Rotation::Horizontal, &4), 9);
 }
