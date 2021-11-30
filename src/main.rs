@@ -95,6 +95,8 @@ fn main() {
 			Key::Char('q') => break,
 			Key::Esc => break,
 			Key::Char('r') => {
+				// reset previous placement
+				board_me = place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Empty);
 				match rotation {
 					Rotation::Horizontal => {
 						rotation = Rotation::Vertical;
@@ -103,6 +105,20 @@ fn main() {
 						rotation = Rotation::Horizontal;
 					}
 				};
+
+				// get new boundaries
+				max_x = get_max_x(&rotation, &ship_size);
+				max_y = get_max_y(&rotation, &ship_size);
+
+				// make sure we're still within the boundaries after rotation
+				if pos_x > max_x {
+					pos_x = max_x;
+				}
+				if pos_y > max_y {
+					pos_y = max_y;
+				}
+
+				board_me = place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 			}
 			Key::Char('\n') => println!("ENTER"),
 			Key::Left => {
