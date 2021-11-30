@@ -11,7 +11,7 @@ enum Board {
 }
 
 // return one line of a board and interpret states to visual styles
-fn get_board_line(board: &[Cell; 10], hide_ships: Board) -> String {
+fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 	let mut output = String::new();
 
 	for i in 0..10 {
@@ -29,7 +29,7 @@ fn get_board_line(board: &[Cell; 10], hide_ships: Board) -> String {
 			},
 			Shot => output += config::SHOT,
 			Ship => {
-				match hide_ships {
+				match board_kind {
 					// we hide ships if we're looking at the AIs board
 					Board::Human => output += config::SHIP,
 					Board::Ai => match i % 2 {
