@@ -2,7 +2,7 @@
 pub const EMPTY: &str = "░░░";
 pub const SHIP: &str = "▓▓▓";
 pub const SHOT: &str = " ◌ ";
-pub const DAMAGE: &str = "╳╳╳";
+pub const DAMAGE: &str = " ╳ ";
 
 // SHIPS
 pub fn get_entitie_size(kind: &str) -> usize {
