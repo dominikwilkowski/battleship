@@ -17,14 +17,7 @@ fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 	for i in 0..10 {
 		match board[i] {
 			Empty => match i % 2 {
-				0 => {
-					output += &format!(
-						"{}{}{}",
-						color::Fg(color::Rgb(100, 100, 100)),
-						config::EMPTY,
-						color::Fg(color::Reset)
-					)
-				}
+				0 => output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset)),
 				_ => output += config::EMPTY,
 			},
 			Shot => output += config::SHOT,
@@ -34,12 +27,7 @@ fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 					Board::Human => output += config::SHIP,
 					Board::Ai => match i % 2 {
 						0 => {
-							output += &format!(
-								"{}{}{}",
-								color::Fg(color::Rgb(100, 100, 100)),
-								config::EMPTY,
-								color::Fg(color::Reset)
-							)
+							output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset))
 						}
 						_ => output += config::EMPTY,
 					},
@@ -80,11 +68,8 @@ pub fn get_header() -> String {
 		color::Fg(color::Rgb(93, 156, 233)),
 		reset
 	);
-	let logo6 = format!(
-		"{}                                                     ┗┛{}",
-		color::Fg(color::Rgb(93, 156, 233)),
-		reset
-	);
+	let logo6 =
+		format!("{}                                                     ┗┛{}", color::Fg(color::Rgb(93, 156, 233)), reset);
 
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
@@ -97,13 +82,7 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
 	let space_bottom = "                                   ║";
 
-	let mut output = format!(
-		"{}{}\r\n{}\r\n{}\r\n",
-		color::Fg(color::White),
-		names,
-		coord_top,
-		frame_top
-	);
+	let mut output = format!("{}{}\r\n{}\r\n{}\r\n", color::Fg(color::White), names, coord_top, frame_top);
 	for i in 0..10 {
 		output += coord_dict[i];
 		output += "│";
