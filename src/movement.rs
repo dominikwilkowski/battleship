@@ -604,3 +604,5 @@ fn is_valid_move_detects_collisions() {
 	assert_eq!(is_valid_move(&board, 6, 4, &Vertical, &2, &Left), false, "Should find a collision");
 	assert_eq!(is_valid_move(&board, 6, 5, &Vertical, &2, &Left), false, "Should find a collision");
 }
+
+pub fn get_next_available_coordinates(board: &[[Cell; 10]; 10]) {}

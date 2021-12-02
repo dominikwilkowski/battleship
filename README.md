@@ -1,3 +1,3 @@
 # Battleship
 
-> Very much in progress unstable
+> Very much in progress - unstable

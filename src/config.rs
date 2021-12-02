@@ -16,6 +16,6 @@ pub fn get_entitie_size(kind: &Ship) -> usize {
 	}
 }
 
-pub const SHIP_ONE_BLOCK_AMOUNT: usize = 0;
+pub const SHIP_ONE_BLOCK_AMOUNT: usize = 3;
 pub const SHIP_TWO_BLOCK_AMOUNT: usize = 2;
 pub const SHIP_THREE_BLOCK_AMOUNT: usize = 1;

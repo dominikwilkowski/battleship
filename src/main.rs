@@ -58,6 +58,8 @@ fn main() {
 	// ];
 	let mut board_ai = [[Empty; 10]; 10];
 
+	let mut is_round_one_done = false;
+
 	// the ships to be placed
 	let mut ships =
 		ShipTracker::new(config::SHIP_ONE_BLOCK_AMOUNT, config::SHIP_TWO_BLOCK_AMOUNT, config::SHIP_THREE_BLOCK_AMOUNT);
@@ -136,7 +138,39 @@ fn main() {
 					board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 				}
 			}
-			Key::Char('\n') => println!("ENTER"),
+			// PLACE SHIP
+			Key::Char('\n') => {
+				match rotation {
+					Rotation::Horizontal => {
+						for offset in 0..ship_size {
+							board_me[pos_y][pos_x + offset] = Cell::Ship;
+						}
+					}
+					Rotation::Vertical => {
+						for offset in 0..ship_size {
+							board_me[pos_y + offset][pos_x] = Cell::Ship;
+						}
+					}
+				}
+
+				// TODO collision detection for new pos_x and pos_y
+				// let (x, y) = movement::get_next_available_coordinates(&board_me);
+				pos_x = 0;
+				pos_y = 0;
+
+				ships.set_ship(&this_ship);
+				match ships.get_next_unset_ship() {
+					Some(kind) => {
+						this_ship = kind;
+						ship_size = config::get_entitie_size(&this_ship);
+						board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+					}
+					None => {
+						is_round_one_done = true;
+					}
+				};
+			}
+			// MOVEMENT
 			Key::Left => {
 				let (board_new, pos_x_new, pos_y_new) =
 					movement::move_ship(board_me, pos_x, pos_y, rotation, ship_size, Direction::Left);
@@ -179,6 +213,10 @@ fn main() {
 		)
 		.unwrap();
 		stdout.flush().unwrap();
+
+		if is_round_one_done {
+			break;
+		}
 	}
 
 	write!(stdout, "{}", termion::cursor::Show).unwrap();

@@ -14,8 +14,8 @@ enum Board {
 fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 	let mut output = String::new();
 
-	for i in 0..10 {
-		match board[i] {
+	for (i, item) in board.iter().enumerate() {
+		match item {
 			Empty => match i % 2 {
 				0 => output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset)),
 				_ => output += config::EMPTY,
