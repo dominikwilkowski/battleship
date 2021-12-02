@@ -5,13 +5,14 @@ pub mod config;
 mod gui;
 mod ships;
 
-use ships::Ships;
+use ships::Ship;
+use ships::ShipTracker;
 use std::io::{stdin, stdout, Write};
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use Cell::{Damage, Empty, Placeholder, Ship, Shot};
+use Cell::{Damage, Empty, Placeholder};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Cell {
@@ -44,23 +45,23 @@ fn main() {
 	let mut board_me = [[Empty; 10]; 10];
 	// let mut board_me = [
 	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty],
-	// 	[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Cell::Ship, Empty, Empty],
+	// 	[Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Cell::Shot, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Cell::Ship, Cell::Ship, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Empty, Empty, Empty, Cell::Shot, Empty, Empty, Empty, Cell::Ship],
+	// 	[Empty, Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Cell::Ship],
 	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Ship, Ship, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Ship],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+	// 	[Empty, Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
 	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
 	// ];
 	let mut board_ai = [[Empty; 10]; 10];
 
 	// the ships to be placed
 	let mut ships =
-		Ships::new(config::SHIP_ONE_BLOCK_AMOUNT, config::SHIP_TWO_BLOCK_AMOUNT, config::SHIP_THREE_BLOCK_AMOUNT);
-	let (kind, index) = ships.get_next_unset_ship();
-	let mut ship_size = config::get_entitie_size(kind);
+		ShipTracker::new(config::SHIP_ONE_BLOCK_AMOUNT, config::SHIP_TWO_BLOCK_AMOUNT, config::SHIP_THREE_BLOCK_AMOUNT);
+	let mut this_ship = ships.get_next_unset_ship().unwrap();
+	let mut ship_size = config::get_entitie_size(&this_ship);
 
 	// rotation of our ship
 	let mut rotation = Rotation::Horizontal;
@@ -724,11 +725,33 @@ fn is_valid_move_detects_collisions() {
 
 	let mut board = [
 		[Empty; 10],
-		[Empty, Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+		[
+			Empty,
+			Cell::Ship,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+		],
 		[Empty; 10],
 		[Empty; 10],
 		[Empty; 10],
-		[Empty, Empty, Empty, Empty, Empty, Ship, Empty, Empty, Empty, Empty],
+		[
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+			Cell::Ship,
+			Empty,
+			Empty,
+			Empty,
+			Empty,
+		],
 		[Empty; 10],
 		[Empty; 10],
 		[Empty; 10],
