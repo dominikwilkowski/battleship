@@ -9,11 +9,11 @@ pub const DAMAGE: &str = " ╳ ";
 
 // SHIPS
 pub fn get_entitie_size(kind: &Ship) -> usize {
-	return match kind {
+	match kind {
 		Ship::OneBlock => 1,
 		Ship::TwoBlock => 2,
 		Ship::ThreeBlock => 3,
-	};
+	}
 }
 
 pub const SHIP_ONE_BLOCK_AMOUNT: usize = 0;
