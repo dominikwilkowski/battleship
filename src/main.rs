@@ -141,18 +141,7 @@ fn main() {
 			}
 			// PLACE SHIP
 			Key::Char('\n') => {
-				match rotation {
-					Rotation::Horizontal => {
-						for offset in 0..ship_size {
-							board_me[pos_y][pos_x + offset] = Cell::Ship;
-						}
-					}
-					Rotation::Vertical => {
-						for offset in 0..ship_size {
-							board_me[pos_y + offset][pos_x] = Cell::Ship;
-						}
-					}
-				}
+				board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Cell::Ship);
 
 				// collision detection for new pos_x and pos_y
 				let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
