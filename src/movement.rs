@@ -330,7 +330,7 @@ fn place_entity_works() {
 	);
 }
 
-fn is_free_space(
+pub fn is_free_space(
 	board: &[[Cell; 10]; 10],
 	temp_pos_x: isize,
 	temp_pos_y: isize,
@@ -370,6 +370,14 @@ fn is_free_space(
 	result
 }
 
+#[test]
+fn is_free_space_works() {
+	let mut board = [[Empty; 10]; 10];
+	board[1][0] = Cell::Ship;
+	board[2][1] = Cell::Ship;
+	assert_eq!(is_free_space(&board, 0, 0, &2, &Rotation::Vertical), false);
+}
+
 pub fn get_next_available_coordinates(
 	board: &[[Cell; 10]; 10],
 	ship_size: &usize,
@@ -403,4 +411,12 @@ pub fn get_next_available_coordinates(
 	}
 
 	(pos_x, pos_y)
+}
+
+#[test]
+fn get_next_available_coordinates_works() {
+	let mut board = [[Empty; 10]; 10];
+	board[1][0] = Cell::Ship;
+	board[2][1] = Cell::Ship;
+	assert_eq!(get_next_available_coordinates(&board, &2, &Rotation::Vertical), (2, 2));
 }

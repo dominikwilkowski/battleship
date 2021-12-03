@@ -82,7 +82,8 @@ fn main() {
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}{}",
+		"{}{}{}{}{}{}{}{}",
+		termion::color::Bg(termion::color::Black),
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
@@ -104,34 +105,12 @@ fn main() {
 			Key::Char('q') => break,
 			Key::Esc => break,
 			Key::Char('r') => {
-				let mut is_valid = true;
-				// we need to make sure that rotating will not land us in an invalid position
 				let new_rotation = match rotation {
-					Rotation::Horizontal => {
-						// going from horizontal to vertical means we only have to check down below
-						for offset in 1..=(ship_size - 1) {
-							if pos_y + offset > 9 || board_me[pos_y + offset][pos_x] != Empty {
-								is_valid = false;
-								break;
-							}
-						}
-
-						Rotation::Vertical
-					}
-					Rotation::Vertical => {
-						// going from horizontal to vertical means we only have to check to the right
-						for offset in 1..=(ship_size - 1) {
-							if pos_x + offset > 9 || board_me[pos_y][pos_x + offset] != Empty {
-								is_valid = false;
-								break;
-							}
-						}
-
-						Rotation::Horizontal
-					}
+					Rotation::Horizontal => Rotation::Vertical,
+					Rotation::Vertical => Rotation::Horizontal,
 				};
 
-				if is_valid {
+				if movement::is_free_space(&board_me, pos_x as isize, pos_y as isize, &ship_size, &new_rotation) {
 					// reset previous placement
 					board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Empty);
 					rotation = new_rotation;
@@ -143,16 +122,15 @@ fn main() {
 			Key::Char('\n') => {
 				board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Cell::Ship);
 
-				// collision detection for new pos_x and pos_y
-				let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
-				pos_x = x;
-				pos_y = y;
-
 				ships.set_ship(&this_ship);
 				match ships.get_next_unset_ship() {
 					Some(kind) => {
 						this_ship = kind;
 						ship_size = config::get_entitie_size(&this_ship);
+						// collision detection for new pos_x and pos_y
+						let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
+						pos_x = x;
+						pos_y = y;
 						board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 					}
 					None => {
@@ -207,11 +185,9 @@ fn main() {
 
 		write!(
 			stdout,
-			"{}{}{}{}{}",
+			"{}{}{}",
 			termion::cursor::Goto(1, header_height),
-			termion::clear::AfterCursor,
 			gui::get_board(board_me, board_ai),
-			gui::get_round1_instructions(),
 			termion::cursor::Restore,
 		)
 		.unwrap();
@@ -230,14 +206,10 @@ fn main() {
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}{}",
-		termion::clear::All,
-		termion::cursor::Goto(1, 2),
-		termion::cursor::Hide,
-		header,
-		board,
-		gui::get_round1_instructions(),
-		termion::cursor::Save
+		"{}{}{}",
+		termion::cursor::Goto(1, header_height),
+		gui::get_board(board_me, board_ai),
+		termion::cursor::Restore,
 	)
 	.unwrap();
 	stdout.flush().unwrap();

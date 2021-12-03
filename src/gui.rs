@@ -44,21 +44,11 @@ fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 
 pub fn get_header() -> String {
 	let reset = color::Fg(color::Reset);
-	let logo1 = format!(
-		"{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n",
-		color::Fg(color::Rgb(255, 255, 255)),
-		reset
-	);
-	let logo2 = format!(
-		"{}           ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}",
-		color::Fg(color::Rgb(255, 255, 255)),
-		reset
-	);
-	let logo3 = format!(
-		"{}           ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}",
-		color::Fg(color::Rgb(255, 255, 255)),
-		reset
-	);
+	let logo1 = format!("{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", color::Fg(color::White), reset);
+	let logo2 =
+		format!("{}           ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}", color::Fg(color::White), reset);
+	let logo3 =
+		format!("{}           ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}", color::Fg(color::White), reset);
 	let logo4 = format!(
 		"{}           ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
 		color::Fg(color::Rgb(180, 209, 245)),
@@ -103,5 +93,7 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 }
 
 pub fn get_round1_instructions() -> String {
-	String::from("\r\n[←↑↓→] position │ [r] rotate │ [Enter] place │ [del] restart | [q] Quit\r\n\r\n")
+	String::from(
+		"\r\nPlace your own ships.\r\n[←↑↓→] position │ [r] rotate │ [Enter] place │ [del] restart | [q] Quit\r\n\r\n",
+	)
 }
