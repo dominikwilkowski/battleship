@@ -153,10 +153,10 @@ fn main() {
 					}
 				}
 
-				// TODO collision detection for new pos_x and pos_y
-				// let (x, y) = movement::get_next_available_coordinates(&board_me);
-				pos_x = 0;
-				pos_y = 0;
+				// collision detection for new pos_x and pos_y
+				let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
+				pos_x = x;
+				pos_y = y;
 
 				ships.set_ship(&this_ship);
 				match ships.get_next_unset_ship() {
@@ -173,28 +173,28 @@ fn main() {
 			// MOVEMENT
 			Key::Left => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, rotation, ship_size, Direction::Left);
+					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Left);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Right => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, rotation, ship_size, Direction::Right);
+					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Right);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Up => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, rotation, ship_size, Direction::Up);
+					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Up);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Down => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, rotation, ship_size, Direction::Down);
+					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Down);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;

@@ -47,6 +47,8 @@ impl ShipTracker {
 		}
 	}
 
+	// we use this function for the tests
+	#[allow(dead_code)]
 	pub fn get_ships(&self) -> &Self {
 		self
 	}
