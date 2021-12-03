@@ -3,7 +3,7 @@ extern crate termion;
 use crate::config;
 use crate::Cell;
 use termion::color;
-use Cell::{Damage, Empty, Placeholder, Ship, Shot};
+use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, Shot};
 
 enum Board {
 	Human,
@@ -35,6 +35,7 @@ fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 			}
 			Damage => output += config::DAMAGE,
 			Placeholder => output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White)),
+			Crosshair => output += &format!("{}{}{}", color::Fg(color::Green), config::CROSSHAIR, color::Fg(color::White)),
 		}
 	}
 

@@ -13,7 +13,7 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use Cell::{Damage, Empty, Placeholder};
+use Cell::{Crosshair, Damage, Empty, Placeholder};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Cell {
@@ -22,6 +22,7 @@ pub enum Cell {
 	Ship,
 	Damage,
 	Placeholder,
+	Crosshair,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -39,7 +40,6 @@ pub enum Direction {
 }
 
 fn main() {
-	let stdin = stdin();
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
 	// our boards
@@ -58,8 +58,6 @@ fn main() {
 	// ];
 	let mut board_ai = [[Empty; 10]; 10];
 
-	let mut is_round_one_done = false;
-
 	// the ships to be placed
 	let mut ships =
 		ShipTracker::new(config::SHIP_ONE_BLOCK_AMOUNT, config::SHIP_TWO_BLOCK_AMOUNT, config::SHIP_THREE_BLOCK_AMOUNT);
@@ -74,13 +72,13 @@ fn main() {
 	let mut pos_y: usize = 0;
 
 	// placing our first ship
-	board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+	board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 
 	// GUI
 	let header = gui::get_header();
 	let header_height: u16 = (header.lines().count() + 2).try_into().unwrap();
 	let board = gui::get_board(board_me, board_ai);
-	let board_height: u16 = (board.lines().count() + 2).try_into().unwrap();
+	// let board_height: u16 = (board.lines().count() + 2).try_into().unwrap();
 
 	write!(
 		stdout,
@@ -96,7 +94,10 @@ fn main() {
 	.unwrap();
 	stdout.flush().unwrap();
 
-	for key in stdin.keys() {
+	let mut is_round_one_done = false;
+
+	// FIRST ROUND setting ships
+	for key in stdin().keys() {
 		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
 
 		match key.unwrap() {
@@ -132,10 +133,10 @@ fn main() {
 
 				if is_valid {
 					// reset previous placement
-					board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Empty);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Empty);
 					rotation = new_rotation;
 					// now place new ship in new rotation
-					board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 				}
 			}
 			// PLACE SHIP
@@ -163,7 +164,7 @@ fn main() {
 					Some(kind) => {
 						this_ship = kind;
 						ship_size = config::get_entitie_size(&this_ship);
-						board_me = movement::place_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+						board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 					}
 					None => {
 						is_round_one_done = true;
@@ -215,6 +216,84 @@ fn main() {
 		stdout.flush().unwrap();
 
 		if is_round_one_done {
+			break;
+		}
+	}
+
+	pos_x = 0;
+	pos_y = 0;
+	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
+
+	let board = gui::get_board(board_me, board_ai);
+
+	write!(
+		stdout,
+		"{}{}{}{}{}{}{}",
+		termion::clear::All,
+		termion::cursor::Goto(1, 2),
+		termion::cursor::Hide,
+		header,
+		board,
+		gui::get_round1_instructions(),
+		termion::cursor::Save
+	)
+	.unwrap();
+	stdout.flush().unwrap();
+
+	let mut is_round_two_done = false;
+
+	// SECOND ROUND shooting turns
+	for key in stdin().keys() {
+		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
+
+		match key.unwrap() {
+			Key::Char('q') => break,
+			Key::Esc => break,
+			// SHOOT
+			Key::Char('\n') => {
+				// SHOOT
+			}
+			// MOVEMENT
+			Key::Left => {
+				let (board_new, pos_x_new, pos_y_new) = movement::move_crosshair(board_ai, pos_x, pos_y, Direction::Left);
+				board_ai = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
+			}
+			Key::Right => {
+				let (board_new, pos_x_new, pos_y_new) = movement::move_crosshair(board_ai, pos_x, pos_y, Direction::Right);
+				board_ai = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
+			}
+			Key::Up => {
+				let (board_new, pos_x_new, pos_y_new) = movement::move_crosshair(board_ai, pos_x, pos_y, Direction::Up);
+				board_ai = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
+			}
+			Key::Down => {
+				let (board_new, pos_x_new, pos_y_new) = movement::move_crosshair(board_ai, pos_x, pos_y, Direction::Down);
+				board_ai = board_new;
+				pos_x = pos_x_new;
+				pos_y = pos_y_new;
+			}
+			_ => {}
+		}
+
+		write!(
+			stdout,
+			"{}{}{}{}{}",
+			termion::cursor::Goto(1, header_height),
+			termion::clear::AfterCursor,
+			gui::get_board(board_me, board_ai),
+			gui::get_round1_instructions(),
+			termion::cursor::Restore,
+		)
+		.unwrap();
+		stdout.flush().unwrap();
+
+		if is_round_two_done {
 			break;
 		}
 	}

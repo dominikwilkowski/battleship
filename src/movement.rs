@@ -2,7 +2,7 @@ use crate::Cell;
 use crate::Direction;
 use crate::Rotation;
 
-use Cell::{Empty, Placeholder};
+use Cell::{Crosshair, Empty, Placeholder};
 
 pub fn move_ship(
 	mut board: [[Cell; 10]; 10],
@@ -16,37 +16,37 @@ pub fn move_ship(
 		Direction::Left => {
 			if is_free_space(&board, pos_x as isize - 1, pos_y as isize, ship_size, rotation) {
 				// clear previous position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Empty);
 				pos_x -= 1;
 				// set new position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 			}
 		}
 		Direction::Right => {
 			if is_free_space(&board, pos_x as isize + 1, pos_y as isize, ship_size, rotation) {
 				// clear previous position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Empty);
 				pos_x += 1;
 				// set new position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 			}
 		}
 		Direction::Up => {
 			if is_free_space(&board, pos_x as isize, pos_y as isize - 1, ship_size, rotation) {
 				// clear previous position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Empty);
 				pos_y -= 1;
 				// set new position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 			}
 		}
 		Direction::Down => {
 			if is_free_space(&board, pos_x as isize, pos_y as isize + 1, ship_size, rotation) {
 				// clear previous position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Empty);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Empty);
 				pos_y += 1;
 				// set new position
-				board = place_ship(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+				board = place_entity(board, pos_x, pos_y, &rotation, &ship_size, Placeholder);
 			}
 		}
 	};
@@ -54,7 +54,55 @@ pub fn move_ship(
 	(board, pos_x, pos_y)
 }
 
-pub fn place_ship(
+pub fn move_crosshair(
+	mut board: [[Cell; 10]; 10],
+	mut pos_x: usize,
+	mut pos_y: usize,
+	direction: Direction,
+) -> ([[Cell; 10]; 10], usize, usize) {
+	match direction {
+		Direction::Left => {
+			if is_free_space(&board, pos_x as isize - 1, pos_y as isize, &1, &Rotation::Horizontal) {
+				// clear previous position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Empty);
+				pos_x -= 1;
+				// set new position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
+			}
+		}
+		Direction::Right => {
+			if is_free_space(&board, pos_x as isize + 1, pos_y as isize, &1, &Rotation::Horizontal) {
+				// clear previous position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Empty);
+				pos_x += 1;
+				// set new position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
+			}
+		}
+		Direction::Up => {
+			if is_free_space(&board, pos_x as isize, pos_y as isize - 1, &1, &Rotation::Horizontal) {
+				// clear previous position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Empty);
+				pos_y -= 1;
+				// set new position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
+			}
+		}
+		Direction::Down => {
+			if is_free_space(&board, pos_x as isize, pos_y as isize + 1, &1, &Rotation::Horizontal) {
+				// clear previous position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Empty);
+				pos_y += 1;
+				// set new position
+				board = place_entity(board, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
+			}
+		}
+	};
+
+	(board, pos_x, pos_y)
+}
+
+pub fn place_entity(
 	mut board: [[Cell; 10]; 10],
 	pos_x: usize,
 	pos_y: usize,
@@ -79,8 +127,8 @@ pub fn place_ship(
 }
 
 #[test]
-fn place_ship_works() {
-	let mut result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &1, Placeholder);
+fn place_entity_works() {
+	let mut result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &1, Placeholder);
 	assert_eq!(
 		result,
 		[
@@ -108,7 +156,7 @@ fn place_ship_works() {
 		]
 	);
 
-	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &2, Placeholder);
+	result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &2, Placeholder);
 	assert_eq!(
 		result,
 		[
@@ -136,7 +184,7 @@ fn place_ship_works() {
 		]
 	);
 
-	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &3, Placeholder);
+	result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Horizontal, &3, Placeholder);
 	assert_eq!(
 		result,
 		[
@@ -164,7 +212,7 @@ fn place_ship_works() {
 		]
 	);
 
-	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &1, Placeholder);
+	result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &1, Placeholder);
 	assert_eq!(
 		result,
 		[
@@ -192,7 +240,7 @@ fn place_ship_works() {
 		]
 	);
 
-	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &2, Placeholder);
+	result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &2, Placeholder);
 	assert_eq!(
 		result,
 		[
@@ -231,7 +279,7 @@ fn place_ship_works() {
 		]
 	);
 
-	result = place_ship([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &3, Placeholder);
+	result = place_entity([[Empty; 10]; 10], 0, 0, &Rotation::Vertical, &3, Placeholder);
 	assert_eq!(
 		result,
 		[

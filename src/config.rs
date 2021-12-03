@@ -3,7 +3,7 @@ use crate::Ship;
 // GUI
 pub const EMPTY: &str = "░░░";
 pub const SHIP: &str = "▓▓▓";
-pub const TARGET: &str = " ◎ ";
+pub const CROSSHAIR: &str = " ◎ ";
 pub const SHOT: &str = " ◌ ";
 pub const DAMAGE: &str = " ╳ ";
 
