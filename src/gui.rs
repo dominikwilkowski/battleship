@@ -103,5 +103,5 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 }
 
 pub fn get_round1_instructions() -> String {
-	String::from("\r\n Arrow keys to position │ [r] rotate │ [Enter] place │ [q] Quit\r\n\r\n")
+	String::from("\r\n[←↑↓→] position │ [r] rotate │ [Enter] place │ [del] restart | [q] Quit\r\n\r\n")
 }

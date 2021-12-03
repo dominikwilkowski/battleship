@@ -189,6 +189,19 @@ fn main() {
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
+			Key::Delete | Key::Backspace => {
+				ships = ShipTracker::new(
+					config::SHIP_ONE_BLOCK_AMOUNT,
+					config::SHIP_TWO_BLOCK_AMOUNT,
+					config::SHIP_THREE_BLOCK_AMOUNT,
+				);
+				this_ship = ships.get_next_unset_ship().unwrap();
+				ship_size = config::get_entitie_size(&this_ship);
+				rotation = Rotation::Horizontal;
+				pos_x = 0;
+				pos_y = 0;
+				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, &rotation, &ship_size, Placeholder);
+			}
 			_ => {}
 		}
 
