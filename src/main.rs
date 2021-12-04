@@ -100,8 +100,12 @@ fn main() {
 		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
 
 		match key.unwrap() {
-			Key::Char('q') => break,
-			Key::Esc => break,
+			Key::Esc | Key::Char('q') => {
+				write!(stdout, "{}{}", termion::cursor::Restore, termion::cursor::Show).unwrap();
+				stdout.flush().unwrap();
+				termion::raw::RawTerminal::suspend_raw_mode(&stdout).unwrap();
+				std::process::exit(0);
+			}
 			Key::Char('r') => {
 				let new_rotation = match rotation {
 					Rotation::Horizontal => Rotation::Vertical,
@@ -219,8 +223,12 @@ fn main() {
 		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
 
 		match key.unwrap() {
-			Key::Char('q') => break,
-			Key::Esc => break,
+			Key::Esc | Key::Char('q') => {
+				write!(stdout, "{}{}", termion::cursor::Restore, termion::cursor::Show).unwrap();
+				stdout.flush().unwrap();
+				termion::raw::RawTerminal::suspend_raw_mode(&stdout).unwrap();
+				std::process::exit(0);
+			}
 			// SHOOT
 			Key::Char('\n') => {
 				// SHOOT
