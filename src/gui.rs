@@ -5,13 +5,8 @@ use crate::Cell;
 use termion::color;
 use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, Shot};
 
-enum Board {
-	Human,
-	Ai,
-}
-
 // return one line of a board and interpret states to visual styles
-fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
+fn get_board_line(board: &[Cell; 10]) -> String {
 	let mut output = String::new();
 
 	for (i, item) in board.iter().enumerate() {
@@ -21,18 +16,7 @@ fn get_board_line(board: &[Cell; 10], board_kind: Board) -> String {
 				_ => output += config::EMPTY,
 			},
 			Shot => output += config::SHOT,
-			Ship => {
-				match board_kind {
-					// we hide ships if we're looking at the AIs board
-					Board::Human => output += config::SHIP,
-					Board::Ai => match i % 2 {
-						0 => {
-							output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset))
-						}
-						_ => output += config::EMPTY,
-					},
-				}
-			}
+			Ship => output += config::SHIP,
 			Damage => output += config::DAMAGE,
 			Placeholder => output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White)),
 			Crosshair => output += &format!("{}{}{}", color::Fg(color::Green), config::CROSSHAIR, color::Fg(color::White)),
@@ -77,11 +61,11 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 	for i in 0..10 {
 		output += coord_dict[i];
 		output += "│";
-		output += &get_board_line(&board_me[i], Board::Human);
+		output += &get_board_line(&board_me[i]);
 		output += "│  ║  ";
 		output += coord_dict[i];
 		output += "│";
-		output += &get_board_line(&board_ai[i], Board::Ai);
+		output += &get_board_line(&board_ai[i]);
 		output += "│\r\n";
 	}
 	output += frame_bottom;
