@@ -40,22 +40,20 @@ pub enum Direction {
 }
 
 fn main() {
+	let size = termion::terminal_size();
+	if size.is_ok() {
+		let (width, height) = size.unwrap();
+		if width < config::MIN_WIDTH || height < config::MIN_HEIGHT {
+			panic!("This terminal is not big enough with width:{} height:{}.\r\nTo play Battlefield you need at least with:{} height:{}", width, height, config::MIN_WIDTH, config::MIN_HEIGHT);
+		}
+	} else {
+		panic!("The size of the terminal can't be determined");
+	}
+
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
 	// our boards
 	let mut board_me = [[Empty; 10]; 10];
-	// let mut board_me = [
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Cell::Ship, Empty, Empty],
-	// 	[Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Cell::Shot, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Cell::Ship, Cell::Ship, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Cell::Shot, Empty, Empty, Empty, Cell::Ship],
-	// 	[Empty, Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Cell::Ship],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Cell::Ship, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
-	// 	[Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Damage],
-	// ];
 	let mut board_ai = [[Empty; 10]; 10];
 
 	// the ships to be placed
