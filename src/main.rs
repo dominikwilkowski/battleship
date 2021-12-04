@@ -60,7 +60,7 @@ fn main() {
 
 	// let the AI generate their own ship placements
 	board_secret = ai::set_ships(board_secret);
-	// board_ai = board_secret;
+	// board_ai = board_secret; // to visualize the ai board instantly
 
 	// the ships to be placed
 	let mut ships =
