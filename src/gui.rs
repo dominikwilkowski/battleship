@@ -55,7 +55,6 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
 	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
-	let space_bottom = "                                   ║";
 
 	let mut output = format!("{}{}\r\n{}\r\n{}\r\n", color::Fg(color::White), names, coord_top, frame_top);
 	for i in 0..10 {
@@ -69,8 +68,7 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 		output += "│\r\n";
 	}
 	output += frame_bottom;
-	output += "\r\n";
-	output += space_bottom;
+	output += "\r\n\r\n";
 	output += &format!("{}", color::Fg(color::Reset));
 
 	output
@@ -78,6 +76,18 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 
 pub fn get_round1_instructions() -> String {
 	String::from(
-		"\r\nPlace your own ships.\r\n[←↑↓→] position │ [r] rotate │ [Enter] place │ [del] restart | [q] Quit\r\n\r\n",
+		format!(
+			"\r\n{}PLACING ROUND - Place your own ships{}\r\n[←↑↓→] position ║ [r] rotate ║ [Enter] place ║ [del] restart ║ [q] Quit\r\n\r\n",
+			color::Fg(color::Green),
+			color::Fg(color::Reset),
+		)
 	)
+}
+
+pub fn get_round2_instructions() -> String {
+	String::from(format!(
+		"\r\n{}PLAY - Try to find all the ships of your opponent.{}\r\n[←↑↓→] position ║ [Enter] shoot ║ [q] Quit\r\n\r\n",
+		color::Fg(color::Green),
+		color::Fg(color::Reset),
+	))
 }

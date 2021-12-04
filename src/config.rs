@@ -2,7 +2,7 @@ use crate::Ship;
 
 // SIZE
 pub const MIN_WIDTH: u16 = 80;
-pub const MIN_HEIGHT: u16 = 30;
+pub const MIN_HEIGHT: u16 = 35;
 
 // GUI
 pub const EMPTY: &str = "░░░";

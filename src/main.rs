@@ -4,9 +4,11 @@ extern crate termion;
 mod ai;
 pub mod config;
 mod gui;
+mod history;
 pub mod movement;
 pub mod ships;
 
+use history::History;
 use ships::Ship;
 use ships::ShipTracker;
 use std::io::{stdin, stdout, Write};
@@ -58,6 +60,8 @@ fn main() {
 	let mut board_ai = [[Empty; 10]; 10];
 	let mut board_secret = [[Empty; 10]; 10];
 
+	let mut history = History::new();
+
 	// let the AI generate their own ship placements
 	board_secret = ai::set_ships(board_secret);
 	// board_ai = board_secret; // to visualize the ai board instantly
@@ -86,13 +90,14 @@ fn main() {
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}{}{}",
+		"{}{}{}{}{}{}{}{}{}",
 		termion::color::Bg(termion::color::Black),
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
 		header,
 		board,
+		history.get_history(),
 		gui::get_round1_instructions(),
 		termion::cursor::Save
 	)
@@ -209,12 +214,16 @@ fn main() {
 	pos_x = 0;
 	pos_y = 0;
 	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+	history.set_history("Me: Placed ships");
 
 	write!(
 		stdout,
-		"{}{}{}",
+		"{}{}{}{}{}{}",
 		termion::cursor::Goto(1, header_height),
+		termion::clear::AfterCursor,
 		gui::get_board(board_me, board_ai),
+		history.get_history(),
+		gui::get_round2_instructions(),
 		termion::cursor::Restore,
 	)
 	.unwrap();
@@ -235,7 +244,15 @@ fn main() {
 			}
 			// SHOOT
 			Key::Char('\n') => {
-				// SHOOT
+				// check coords against board_secret
+				// mark board_ai
+				// if hit then go again
+				// if no hit ai turn
+				// sleep(1)
+				// call ai::shoot()
+				// sleep(1)
+				// check coords against board_me
+				// if hit then call sleep(1) and ai::shoot_after_hit()
 			}
 			// MOVEMENT
 			Key::Left => {
@@ -267,11 +284,12 @@ fn main() {
 
 		write!(
 			stdout,
-			"{}{}{}{}{}",
+			"{}{}{}{}{}{}",
 			termion::cursor::Goto(1, header_height),
 			termion::clear::AfterCursor,
 			gui::get_board(board_me, board_ai),
-			gui::get_round1_instructions(),
+			history.get_history(),
+			gui::get_round2_instructions(),
 			termion::cursor::Restore,
 		)
 		.unwrap();
