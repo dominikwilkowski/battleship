@@ -1,10 +1,11 @@
 extern crate rand;
 extern crate termion;
 
+mod ai;
 pub mod config;
 mod gui;
-mod movement;
-mod ships;
+pub mod movement;
+pub mod ships;
 
 use ships::Ship;
 use ships::ShipTracker;
@@ -13,7 +14,7 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use Cell::{Crosshair, Damage, Empty, Placeholder};
+use Cell::{Crosshair, Empty, Placeholder};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Cell {
@@ -55,6 +56,11 @@ fn main() {
 	// our boards
 	let mut board_me = [[Empty; 10]; 10];
 	let mut board_ai = [[Empty; 10]; 10];
+	let mut board_secret = [[Empty; 10]; 10];
+
+	// let the AI generate their own ship placements
+	board_secret = ai::set_ships(board_secret);
+	// board_ai = board_secret;
 
 	// the ships to be placed
 	let mut ships =
