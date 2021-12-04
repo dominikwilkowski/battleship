@@ -74,6 +74,31 @@ pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> Stri
 	output
 }
 
+pub fn get_coord(pos_x: usize, pos_y: usize) -> String {
+	let alphabet = ('A'..='J')
+		.filter_map(|c| {
+			let c = c as char;
+			if c.is_alphabetic() {
+				Some(c)
+			} else {
+				None
+			}
+		})
+		.collect::<Vec<_>>();
+
+	format!("{}{}", alphabet[pos_y], pos_x + 1)
+}
+
+#[test]
+fn get_coord_works() {
+	assert_eq!(get_coord(0, 0), String::from("A1"));
+	assert_eq!(get_coord(1, 0), String::from("A2"));
+	assert_eq!(get_coord(0, 1), String::from("B1"));
+	assert_eq!(get_coord(9, 0), String::from("A10"));
+	assert_eq!(get_coord(0, 9), String::from("J1"));
+	assert_eq!(get_coord(9, 9), String::from("J10"));
+}
+
 pub fn get_round1_instructions() -> String {
 	String::from(
 		format!(

@@ -244,6 +244,7 @@ fn main() {
 			}
 			// SHOOT
 			Key::Char('\n') => {
+				history.set_history(&format!("Me: Shoots at {}", gui::get_coord(pos_x, pos_y)));
 				// check coords against board_secret
 				// mark board_ai
 				// if hit then go again
