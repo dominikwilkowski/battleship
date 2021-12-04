@@ -18,7 +18,6 @@ impl History {
 		let l = if self.archive.len() > 2 { 3 } else { self.archive.len() };
 
 		let mut result = self.archive.as_slice()[self.archive.len() - l..].to_vec();
-		result.reverse();
 		result
 	}
 
@@ -50,41 +49,41 @@ fn history_works() {
 	let mut history = History::new();
 	assert_eq!(history.get_hisory_slice(), vec![String::from("- Game started -")]);
 	history.set_history("Entry 1");
-	assert_eq!(history.get_hisory_slice(), vec![String::from("Entry 1"), String::from("- Game started -")]);
+	assert_eq!(history.get_hisory_slice(), vec![String::from("- Game started -"), String::from("Entry 1")]);
 	history.set_history("Entry 2");
 	assert_eq!(
 		history.get_hisory_slice(),
 		vec![
-			String::from("Entry 2"),
+			String::from("- Game started -"),
 			String::from("Entry 1"),
-			String::from("- Game started -")
+			String::from("Entry 2"),
 		]
 	);
 	history.set_history("Entry 3");
 	assert_eq!(
 		history.get_hisory_slice(),
 		vec![
-			String::from("Entry 3"),
+			String::from("Entry 1"),
 			String::from("Entry 2"),
-			String::from("Entry 1")
+			String::from("Entry 3"),
 		]
 	);
 	history.set_history("Entry 4");
 	assert_eq!(
 		history.get_hisory_slice(),
 		vec![
-			String::from("Entry 4"),
+			String::from("Entry 2"),
 			String::from("Entry 3"),
-			String::from("Entry 2")
+			String::from("Entry 4"),
 		]
 	);
 	history.set_history("Entry 5");
 	assert_eq!(
 		history.get_hisory_slice(),
 		vec![
-			String::from("Entry 5"),
+			String::from("Entry 3"),
 			String::from("Entry 4"),
-			String::from("Entry 3")
+			String::from("Entry 5"),
 		]
 	);
 }
