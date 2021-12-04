@@ -42,3 +42,17 @@ pub fn set_ships(mut board: [[Cell; 10]; 10]) -> [[Cell; 10]; 10] {
 
 	board
 }
+
+#[test]
+fn set_ships_works() {
+	let mut ships = 0;
+	let board = set_ships([[Cell::Empty; 10]; 10]);
+	for row in board {
+		for cell in row {
+			if cell == Cell::Ship {
+				ships += 1;
+			}
+		}
+	}
+	assert_eq!(ships, 10);
+}
