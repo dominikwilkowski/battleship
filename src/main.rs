@@ -70,7 +70,7 @@ fn main() {
 	let mut pos_y: usize = 0;
 
 	// placing our first ship
-	board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+	board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
 
 	// GUI
 	let header = gui::get_header();
@@ -114,15 +114,15 @@ fn main() {
 
 				if movement::is_free_space(&board_me, pos_x as isize, pos_y as isize, &ship_size, &new_rotation) {
 					// reset previous placement
-					board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Empty);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Empty);
 					rotation = new_rotation;
 					// now place new ship in new rotation
-					board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
 				}
 			}
 			// PLACE SHIP
 			Key::Char('\n') => {
-				board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Cell::Ship);
+				board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Cell::Ship);
 
 				ships.set_ship(&this_ship);
 				match ships.get_next_unset_ship() {
@@ -133,7 +133,7 @@ fn main() {
 						let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
 						pos_x = x;
 						pos_y = y;
-						board_me = movement::place_entity(board_me, pos_x, pos_y, &rotation, &ship_size, Placeholder);
+						board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
 					}
 					None => {
 						is_round_one_done = true;
@@ -180,7 +180,7 @@ fn main() {
 				rotation = Rotation::Horizontal;
 				pos_x = 0;
 				pos_y = 0;
-				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, &rotation, &ship_size, Placeholder);
+				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, &ship_size, &rotation, Placeholder);
 			}
 			_ => {}
 		}
@@ -202,9 +202,7 @@ fn main() {
 
 	pos_x = 0;
 	pos_y = 0;
-	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &Rotation::Horizontal, &1, Crosshair);
-
-	let board = gui::get_board(board_me, board_ai);
+	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
 
 	write!(
 		stdout,
