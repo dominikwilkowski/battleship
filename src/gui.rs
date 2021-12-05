@@ -124,7 +124,7 @@ fn get_coord_works() {
 pub fn get_round1_instructions() -> String {
 	String::from(
 		format!(
-			"\r\n{}PLACING ROUND - Place your own ships{}\r\n[←↑↓→] position ║ [r] rotate ║ [Enter] place ║ [del] restart ║ [q] Quit\r\n\r\n",
+			"\r\n{}PLACING ROUND - Place your own ships{}\r\n[←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
 			color::Fg(color::Green),
 			color::Fg(color::Reset),
 		)
@@ -133,7 +133,7 @@ pub fn get_round1_instructions() -> String {
 
 pub fn get_round2_instructions() -> String {
 	String::from(format!(
-		"\r\n{}PLAY - Try to find all the ships of your opponent{}\r\n[←↑↓→] position ║ [Enter] shoot ║ [q] Quit\r\n\r\n",
+		"\r\n{}PLAY - Try to find all the ships of your opponent{}\r\n[←↑↓→] position ║ [enter] shoot ║ [q] quit\r\n\r\n",
 		color::Fg(color::Green),
 		color::Fg(color::Reset),
 	))

@@ -17,8 +17,7 @@ impl History {
 	fn get_hisory_slice(&self) -> Vec<String> {
 		let l = if self.archive.len() > 2 { 3 } else { self.archive.len() };
 
-		let mut result = self.archive.as_slice()[self.archive.len() - l..].to_vec();
-		result
+		self.archive.as_slice()[self.archive.len() - l..].to_vec()
 	}
 
 	pub fn get_history(&self) -> String {
