@@ -21,8 +21,6 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 		}
 	}
 
-	score = score;
-
 	format!("{:0>2}", score)
 }
 
