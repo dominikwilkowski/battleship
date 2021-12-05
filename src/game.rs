@@ -4,7 +4,7 @@ use crate::Cell;
 pub enum HitType {
 	Hit,
 	HitNSunk,
-	Water,
+	Miss,
 }
 
 pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
@@ -13,7 +13,7 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 	for row in board {
 		for cell in row {
 			match cell {
-				Cell::ShipOne(_) | Cell::ShipTwo(_) | Cell::ShipThree(_) => {
+				Cell::Damage => {
 					score += 1;
 				}
 				_ => {}
@@ -21,7 +21,7 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 		}
 	}
 
-	score = 10 - score;
+	score = score;
 
 	format!("{:0>2}", score)
 }
@@ -29,9 +29,9 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 #[test]
 fn get_score_works() {
 	let mut board = [[Cell::Empty; 10]; 10];
-	assert_eq!(get_score(&board), String::from("10"));
-	board[0][0] = Cell::Damage;
-	assert_eq!(get_score(&board), String::from("10"));
+	assert_eq!(get_score(&board), String::from("00"));
+	board[0][0] = Cell::ShipTwo([0, 0, 0, 0]);
+	assert_eq!(get_score(&board), String::from("00"));
 	board[1][0] = Cell::ShipOne([0, 0]);
 	board[1][1] = Cell::ShipOne([0, 0]);
 	board[1][2] = Cell::ShipOne([0, 0]);
@@ -66,7 +66,7 @@ fn get_score_works() {
 }
 
 pub fn get_hit_type(board: &[[Cell; 10]; 10], pos_x: usize, pos_y: usize) -> HitType {
-	let mut result = HitType::Water;
+	let mut result = HitType::Miss;
 
 	match board[pos_y][pos_x] {
 		Cell::ShipOne(_) => {
@@ -112,7 +112,7 @@ pub fn get_hit_type(board: &[[Cell; 10]; 10], pos_x: usize, pos_y: usize) -> Hit
 #[test]
 fn hit_type_works() {
 	let mut board = [[Cell::Empty; 10]; 10];
-	assert_eq!(get_hit_type(&board, 0, 0), HitType::Water);
+	assert_eq!(get_hit_type(&board, 0, 0), HitType::Miss);
 	board[0][0] = Cell::ShipOne([0, 0]);
 	assert_eq!(get_hit_type(&board, 0, 0), HitType::HitNSunk);
 
@@ -129,6 +129,6 @@ fn hit_type_works() {
 	board[6][5] = Cell::Damage;
 	assert_eq!(get_hit_type(&board, 5, 7), HitType::Hit);
 	board[7][5] = Cell::Damage;
-	assert_eq!(get_hit_type(&board, 1, 1), HitType::Water);
+	assert_eq!(get_hit_type(&board, 1, 1), HitType::Miss);
 	assert_eq!(get_hit_type(&board, 5, 5), HitType::HitNSunk);
 }

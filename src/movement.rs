@@ -428,31 +428,29 @@ pub fn get_next_available_coordinates(
 	ship_size: &usize,
 	rotation: &Rotation,
 ) -> (usize, usize) {
-	let mut o = 0;
 	let mut pos_x = 0;
 	let mut pos_y = 0;
 
 	'outer: for i in 0..10 {
 		for n in 0..i {
-			if is_free_space(&board, o as isize, n as isize, ship_size, rotation) {
-				pos_x = o as usize;
+			if is_free_space(&board, i as isize, n as isize, ship_size, rotation) {
+				pos_x = i as usize;
 				pos_y = n as usize;
 				break 'outer;
 			}
 
-			if is_free_space(&board, n as isize, o as isize, ship_size, rotation) {
+			if is_free_space(&board, n as isize, i as isize, ship_size, rotation) {
 				pos_x = n as usize;
-				pos_y = o as usize;
+				pos_y = i as usize;
 				break 'outer;
 			}
 		}
 
-		if is_free_space(&board, o as isize, o as isize, ship_size, rotation) {
-			pos_x = o as usize;
-			pos_y = o as usize;
+		if is_free_space(&board, i as isize, i as isize, ship_size, rotation) {
+			pos_x = i as usize;
+			pos_y = i as usize;
 			break;
 		}
-		o += 1;
 	}
 
 	(pos_x, pos_y)

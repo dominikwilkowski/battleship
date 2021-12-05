@@ -17,7 +17,7 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-use Cell::{Crosshair, Empty, Placeholder};
+use Cell::{Crosshair, Damage, Empty, Placeholder, Shot};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Cell {
@@ -248,21 +248,46 @@ fn main() {
 			}
 			// SHOOT
 			Key::Char('\n') => {
-				// game::was_hit(&board, pos_x, pos_y)
-				history.set_history(&format!("Shoot at {}", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
-				// if hit
-				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage)
-				// if empty || hit_n_sunk
-				// -> (pos_x,pos_y) = ai::shoot()
-				// -> was_hit(&board, pos_x, pos_y)
-				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage | Shot)
-				// -> history.set_history(&format!("Shoot at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)), history::Actor::Ai);
-				// -> sleep(1)
-				// -> if hit
-				// -> -> ai::shoot_after_hit(previous_shots)
-				// -> -> was_hit(&board, pos_x, pos_y)
-				// -> -> sleep(1)
-				// -> -> call itself
+				let mut ai_move = false;
+				let hit_type = game::get_hit_type(&board_secret, pos_x, pos_y);
+				match hit_type {
+					game::HitType::Hit => {
+						history
+							.set_history(&format!("Shoot at {} and hit a ship", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Damage);
+					}
+					game::HitType::HitNSunk => {
+						history.set_history(
+							&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(pos_x, pos_y)),
+							history::Actor::Me,
+						);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Damage);
+						ai_move = true;
+					}
+					game::HitType::Miss => {
+						history.set_history(&format!("Shoot at {} and missed", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Shot);
+						ai_move = true;
+					}
+				};
+
+				if ai_move {
+					// (pos_x,pos_y) = ai::shoot()
+					// let hit_type = game::get_hit_type(&board_secret, pos_x, pos_y);
+					// board_me = movement::place_entity(board_me, pos_x, pos_y, &1, &Rotation:Horizontal, Damage | Shot)
+					// history.set_history(&format!("Shoot at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)), history::Actor::Ai);
+					// sleep(1)
+					// if hit
+					// -> ai::shoot_after_hit(previous_shots)
+					// -> game::get_hit_type(&board, pos_x, pos_y)
+					// -> sleep(1)
+					// -> call itself
+				}
+
+				let (x, y) = movement::get_next_available_coordinates(&board_ai, &1, &Rotation::Horizontal);
+				pos_x = x;
+				pos_y = y;
+				board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Placeholder);
 			}
 			// MOVEMENT
 			Key::Left => {
@@ -297,7 +322,7 @@ fn main() {
 			"{}{}{}{}{}{}{}",
 			termion::cursor::Goto(1, header_height - 1),
 			termion::clear::AfterCursor,
-			gui::get_score(board_me, board_secret, true),
+			gui::get_score(board_me, board_ai, true),
 			gui::get_board(board_me, board_ai),
 			history.get_history(),
 			gui::get_round2_instructions(),
