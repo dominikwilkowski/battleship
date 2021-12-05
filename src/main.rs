@@ -216,7 +216,8 @@ fn main() {
 	pos_x = 0;
 	pos_y = 0;
 	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
-	history.set_history("ME: Placed ships");
+	history.set_history("Placed ships", history::Actor::Me);
+	history.set_history("Placed ships", history::Actor::Ai);
 
 	write!(
 		stdout,
@@ -247,19 +248,18 @@ fn main() {
 			}
 			// SHOOT
 			Key::Char('\n') => {
-				history.set_history(&format!("ME: Shoots at {}", gui::get_coord(pos_x, pos_y)));
-				// was_hit(&board, pos_x, pos_y)
-				// if true
+				// game::was_hit(&board, pos_x, pos_y)
+				history.set_history(&format!("Shoot at {}", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
+				// if hit
 				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage)
-				// -> go again
-				// if false
+				// if empty || hit_n_sunk
 				// -> (pos_x,pos_y) = ai::shoot()
 				// -> was_hit(&board, pos_x, pos_y)
-				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage)
-				// -> history.set_history(&format!("AI: Shoots at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)));
+				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage | Shot)
+				// -> history.set_history(&format!("Shoot at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)), history::Actor::Ai);
 				// -> sleep(1)
-				// -> if true
-				// -> -> ai::shoot_after_hit()
+				// -> if hit
+				// -> -> ai::shoot_after_hit(previous_shots)
 				// -> -> was_hit(&board, pos_x, pos_y)
 				// -> -> sleep(1)
 				// -> -> call itself

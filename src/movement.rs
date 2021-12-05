@@ -296,30 +296,21 @@ pub fn place_entity(
 
 		board[y][x] = match cell {
 			Cell::Ship => match *ship_size {
-				1 => {
-					let mut this_coords: [usize; 2] = [0; 2];
-					this_coords[0] = coords[0] as usize;
-					this_coords[1] = coords[1] as usize;
-					ShipOne(this_coords)
-				}
-				2 => {
-					let mut this_coords: [usize; 4] = [0; 4];
-					this_coords[0] = coords[0] as usize;
-					this_coords[1] = coords[1] as usize;
-					this_coords[2] = coords[2] as usize;
-					this_coords[3] = coords[3] as usize;
-					ShipTwo(this_coords)
-				}
-				_ => {
-					let mut this_coords: [usize; 6] = [0; 6];
-					this_coords[0] = coords[0] as usize;
-					this_coords[1] = coords[1] as usize;
-					this_coords[2] = coords[2] as usize;
-					this_coords[3] = coords[3] as usize;
-					this_coords[4] = coords[4] as usize;
-					this_coords[5] = coords[5] as usize;
-					ShipThree(this_coords)
-				}
+				1 => ShipOne([coords[0] as usize, coords[1] as usize]),
+				2 => ShipTwo([
+					coords[0] as usize,
+					coords[1] as usize,
+					coords[2] as usize,
+					coords[3] as usize,
+				]),
+				_ => ShipThree([
+					coords[0] as usize,
+					coords[1] as usize,
+					coords[2] as usize,
+					coords[3] as usize,
+					coords[4] as usize,
+					coords[5] as usize,
+				]),
 			},
 			_ => cell,
 		};
