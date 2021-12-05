@@ -49,7 +49,6 @@ pub enum Direction {
 fn main() {
 	let size = termion::terminal_size();
 	if let Ok((width, height)) = size {
-		let (width, height) = size.unwrap();
 		if width < config::MIN_WIDTH || height < config::MIN_HEIGHT {
 			panic!("\r\n\r\n{}This terminal is not big enough with width:{} height:{}.\r\nTo play Battlefield you need at least with:{} height:{}{}\r\n\r\n", termion::color::Fg(termion::color::Red), width, height, config::MIN_WIDTH, config::MIN_HEIGHT, termion::color::Fg(termion::color::Reset));
 		}
