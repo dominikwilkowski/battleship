@@ -5,7 +5,7 @@ use crate::game;
 use crate::Cell;
 
 use termion::color;
-use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, Shot};
+use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, ShipOne, ShipThree, ShipTwo, Shot};
 
 // return one line of a board and interpret states to visual styles
 fn get_board_line(board: &[Cell; 10]) -> String {
@@ -18,7 +18,7 @@ fn get_board_line(board: &[Cell; 10]) -> String {
 				_ => output += config::EMPTY,
 			},
 			Shot => output += config::SHOT,
-			Ship => output += config::SHIP,
+			Ship | ShipOne(_) | ShipTwo(_) | ShipThree(_) => output += config::SHIP,
 			Damage => output += config::DAMAGE,
 			Placeholder => output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White)),
 			Crosshair => output += &format!("{}{}{}", color::Fg(color::Green), config::CROSSHAIR, color::Fg(color::White)),

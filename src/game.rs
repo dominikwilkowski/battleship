@@ -5,8 +5,11 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 
 	for row in board {
 		for cell in row {
-			if *cell == Cell::Ship {
-				score += 1;
+			match cell {
+				Cell::ShipOne(_) | Cell::ShipTwo(_) | Cell::ShipThree(_) => {
+					score += 1;
+				}
+				_ => {}
 			}
 		}
 	}

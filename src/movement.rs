@@ -2,7 +2,7 @@ use crate::Cell;
 use crate::Direction;
 use crate::Rotation;
 
-use Cell::{Crosshair, Empty, Placeholder};
+use Cell::{Crosshair, Empty, Placeholder, ShipOne, ShipThree, ShipTwo};
 
 pub fn move_ship(
 	mut board: [[Cell; 10]; 10],
@@ -268,17 +268,61 @@ pub fn place_entity(
 	rotation: &Rotation,
 	cell: Cell,
 ) -> [[Cell; 10]; 10] {
+	let mut coords: Vec<u8> = vec![];
+
 	match rotation {
 		Rotation::Horizontal => {
 			for offset in 0..*ship_size {
-				board[pos_y][pos_x + offset] = cell;
+				coords.push(pos_x as u8 + offset as u8);
+				coords.push(pos_y as u8);
+				// board[pos_y][pos_x + offset] = cell;
 			}
 		}
 		Rotation::Vertical => {
 			for offset in 0..*ship_size {
-				board[pos_y + offset][pos_x] = cell;
+				coords.push(pos_x as u8);
+				coords.push(pos_y as u8 + offset as u8);
+				// board[pos_y + offset][pos_x] = cell;
 			}
 		}
+	}
+
+	let mut i = 0;
+	while i < coords.len() {
+		let x = coords[i] as usize;
+		i += 1;
+		let y = coords[i] as usize;
+		i += 1;
+
+		board[y][x] = match cell {
+			Cell::Ship => match *ship_size {
+				1 => {
+					let mut this_coords: [usize; 2] = [0; 2];
+					this_coords[0] = coords[0] as usize;
+					this_coords[1] = coords[1] as usize;
+					ShipOne(this_coords)
+				}
+				2 => {
+					let mut this_coords: [usize; 4] = [0; 4];
+					this_coords[0] = coords[0] as usize;
+					this_coords[1] = coords[1] as usize;
+					this_coords[2] = coords[2] as usize;
+					this_coords[3] = coords[3] as usize;
+					ShipTwo(this_coords)
+				}
+				_ => {
+					let mut this_coords: [usize; 6] = [0; 6];
+					this_coords[0] = coords[0] as usize;
+					this_coords[1] = coords[1] as usize;
+					this_coords[2] = coords[2] as usize;
+					this_coords[3] = coords[3] as usize;
+					this_coords[4] = coords[4] as usize;
+					this_coords[5] = coords[5] as usize;
+					ShipThree(this_coords)
+				}
+			},
+			_ => cell,
+		};
 	}
 
 	board

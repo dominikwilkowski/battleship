@@ -49,8 +49,11 @@ fn set_ships_works() {
 	let board = set_ships([[Cell::Empty; 10]; 10]);
 	for row in board {
 		for cell in row {
-			if cell == Cell::Ship {
-				ships += 1;
+			match cell {
+				Cell::ShipOne(_) | Cell::ShipTwo(_) | Cell::ShipThree(_) => {
+					ships += 1;
+				}
+				_ => {}
 			}
 		}
 	}
