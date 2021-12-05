@@ -3,6 +3,7 @@ extern crate termion;
 
 mod ai;
 pub mod config;
+pub mod game;
 mod gui;
 mod history;
 pub mod movement;
@@ -84,19 +85,18 @@ fn main() {
 
 	// GUI
 	let header = gui::get_header();
-	let header_height: u16 = (header.lines().count() + 2).try_into().unwrap();
-	let board = gui::get_board(board_me, board_ai);
-	// let board_height: u16 = (board.lines().count() + 2).try_into().unwrap();
+	let header_height: u16 = (header.lines().count() + 3).try_into().unwrap();
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}{}{}{}",
+		"{}{}{}{}{}{}{}{}{}{}",
 		termion::color::Bg(termion::color::Black),
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
 		termion::cursor::Hide,
 		header,
-		board,
+		gui::get_score(board_me, board_secret, false),
+		gui::get_board(board_me, board_ai),
 		history.get_history(),
 		gui::get_round1_instructions(),
 		termion::cursor::Save
@@ -214,13 +214,14 @@ fn main() {
 	pos_x = 0;
 	pos_y = 0;
 	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
-	history.set_history("Me: Placed ships");
+	history.set_history("ME: Placed ships");
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}",
-		termion::cursor::Goto(1, header_height),
+		"{}{}{}{}{}{}{}",
+		termion::cursor::Goto(1, header_height - 1),
 		termion::clear::AfterCursor,
+		gui::get_score(board_me, board_secret, true),
 		gui::get_board(board_me, board_ai),
 		history.get_history(),
 		gui::get_round2_instructions(),
@@ -244,16 +245,22 @@ fn main() {
 			}
 			// SHOOT
 			Key::Char('\n') => {
-				history.set_history(&format!("Me: Shoots at {}", gui::get_coord(pos_x, pos_y)));
-				// check coords against board_secret
-				// mark board_ai
-				// if hit then go again
-				// if no hit ai turn
-				// sleep(1)
-				// call ai::shoot()
-				// sleep(1)
-				// check coords against board_me
-				// if hit then call sleep(1) and ai::shoot_after_hit()
+				history.set_history(&format!("ME: Shoots at {}", gui::get_coord(pos_x, pos_y)));
+				// was_hit(&board, pos_x, pos_y)
+				// if true
+				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage)
+				// -> go again
+				// if false
+				// -> (pos_x,pos_y) = ai::shoot()
+				// -> was_hit(&board, pos_x, pos_y)
+				// -> movement::place_entity(board, pos_x, pos_y, &1, &Rotation:Horizontal, Damage)
+				// -> history.set_history(&format!("AI: Shoots at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)));
+				// -> sleep(1)
+				// -> if true
+				// -> -> ai::shoot_after_hit()
+				// -> -> was_hit(&board, pos_x, pos_y)
+				// -> -> sleep(1)
+				// -> -> call itself
 			}
 			// MOVEMENT
 			Key::Left => {
@@ -285,9 +292,10 @@ fn main() {
 
 		write!(
 			stdout,
-			"{}{}{}{}{}{}",
-			termion::cursor::Goto(1, header_height),
+			"{}{}{}{}{}{}{}",
+			termion::cursor::Goto(1, header_height - 1),
 			termion::clear::AfterCursor,
+			gui::get_score(board_me, board_secret, true),
 			gui::get_board(board_me, board_ai),
 			history.get_history(),
 			gui::get_round2_instructions(),

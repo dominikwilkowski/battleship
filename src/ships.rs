@@ -47,8 +47,6 @@ impl ShipTracker {
 		}
 	}
 
-	// we use this function for the tests
-	#[allow(dead_code)]
 	pub fn get_ships(&self) -> (usize, usize, usize) {
 		(self.one_block, self.two_block, self.three_block)
 	}

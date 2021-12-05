@@ -1,7 +1,9 @@
 extern crate termion;
 
 use crate::config;
+use crate::game;
 use crate::Cell;
+
 use termion::color;
 use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, Shot};
 
@@ -49,14 +51,34 @@ pub fn get_header() -> String {
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
 
+pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], show_score: bool) -> String {
+	let score_me = if show_score {
+		game::get_score(&board_ai)
+	} else {
+		String::from("--")
+	};
+	let score_ai = if show_score {
+		game::get_score(&board_me)
+	} else {
+		String::from("--")
+	};
+
+	format!(
+		"ME                     {open}SCORE: {score_me}{close}   ║  AI                     {open}SCORE: {score_ai}{close}\r\n",
+		open=color::Fg(color::Magenta),
+		close=color::Fg(color::White),
+		score_me=score_me,
+		score_ai=score_ai,
+	)
+}
+
 pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> String {
-	let names = "ME                                 ║  AI";
 	let coord_top = "   1  2  3  4  5  6  7  8  9  10   ║     1  2  3  4  5  6  7  8  9  10";
 	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
 	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
 
-	let mut output = format!("{}{}\r\n{}\r\n{}\r\n", color::Fg(color::White), names, coord_top, frame_top);
+	let mut output = format!("{}{}\r\n{}\r\n", color::Fg(color::White), coord_top, frame_top);
 	for i in 0..10 {
 		output += coord_dict[i];
 		output += "│";
@@ -111,7 +133,7 @@ pub fn get_round1_instructions() -> String {
 
 pub fn get_round2_instructions() -> String {
 	String::from(format!(
-		"\r\n{}PLAY - Try to find all the ships of your opponent.{}\r\n[←↑↓→] position ║ [Enter] shoot ║ [q] Quit\r\n\r\n",
+		"\r\n{}PLAY - Try to find all the ships of your opponent{}\r\n[←↑↓→] position ║ [Enter] shoot ║ [q] Quit\r\n\r\n",
 		color::Fg(color::Green),
 		color::Fg(color::Reset),
 	))
