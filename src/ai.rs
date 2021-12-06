@@ -57,5 +57,8 @@ fn set_ships_works() {
 			}
 		}
 	}
-	assert_eq!(ships, 10);
+
+	let amount =
+		config::SHIP_ONE_BLOCK_AMOUNT + (config::SHIP_TWO_BLOCK_AMOUNT * 2) + (config::SHIP_THREE_BLOCK_AMOUNT * 3);
+	assert_eq!(ships, amount);
 }
