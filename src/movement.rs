@@ -139,9 +139,11 @@ pub fn move_crosshair(
 	mut pos_y: usize,
 	direction: Direction,
 ) -> ([[Cell; 10]; 10], usize, usize) {
+	let bound_x = pos_x;
+	let bound_y = pos_y;
 	match direction {
 		Direction::Left => {
-			for i in (0..pos_x).rev() {
+			for i in (0..bound_x).rev() {
 				let new_pos_x = i as isize;
 				if is_free_space(&board, new_pos_x, pos_y as isize, 1, &Rotation::Horizontal) {
 					// clear previous position
@@ -154,7 +156,7 @@ pub fn move_crosshair(
 			}
 		}
 		Direction::Right => {
-			for i in pos_x..10 {
+			for i in bound_x..10 {
 				let new_pos_x = i as isize;
 				if is_free_space(&board, new_pos_x, pos_y as isize, 1, &Rotation::Horizontal) {
 					// clear previous position
@@ -167,7 +169,7 @@ pub fn move_crosshair(
 			}
 		}
 		Direction::Up => {
-			for i in (0..pos_y).rev() {
+			for i in (0..bound_y).rev() {
 				let new_pos_y = i as isize;
 				if is_free_space(&board, pos_x as isize, new_pos_y, 1, &Rotation::Horizontal) {
 					// clear previous position
@@ -180,7 +182,7 @@ pub fn move_crosshair(
 			}
 		}
 		Direction::Down => {
-			for i in pos_y..10 {
+			for i in bound_y..10 {
 				let new_pos_y = i as isize;
 				if is_free_space(&board, pos_x as isize, new_pos_y, 1, &Rotation::Horizontal) {
 					// clear previous position

@@ -72,7 +72,7 @@ pub struct Attack {
 impl Attack {
 	pub fn new() -> Self {
 		Self {
-			history: vec![],
+			history: vec![(0, 0, game::HitType::Miss), (0, 0, game::HitType::Miss)],
 			todo: vec![],
 		}
 	}
@@ -157,7 +157,11 @@ impl Attack {
 			}
 		}
 
-		let index: usize = rand::thread_rng().gen_range(0..possible_shots.len());
+		let index: usize = if !possible_shots.is_empty() {
+			rand::thread_rng().gen_range(0..possible_shots.len())
+		} else {
+			0
+		};
 
 		(possible_shots[index][0], possible_shots[index][1])
 	}
