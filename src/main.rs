@@ -1,6 +1,8 @@
 extern crate rand;
 extern crate termion;
 
+use std::{thread, time};
+
 mod ai;
 pub mod config;
 pub mod game;
@@ -50,7 +52,7 @@ fn main() {
 	let size = termion::terminal_size();
 	if let Ok((width, height)) = size {
 		if width < config::MIN_WIDTH || height < config::MIN_HEIGHT {
-			panic!("\r\n\r\n{}This terminal is not big enough with width:{} height:{}.\r\nTo play Battlefield you need at least with:{} height:{}{}\r\n\r\n", termion::color::Fg(termion::color::Red), width, height, config::MIN_WIDTH, config::MIN_HEIGHT, termion::color::Fg(termion::color::Reset));
+			panic!("\r\n\r\n{}This terminal is not big enough with width:{} height:{}\r\nTo play Battlefield you need at least with:{} height:{}{}\r\n\r\n", termion::color::Fg(termion::color::Red), width, height, config::MIN_WIDTH, config::MIN_HEIGHT, termion::color::Fg(termion::color::Reset));
 		}
 	} else {
 		panic!("The size of the terminal can't be determined");
@@ -271,17 +273,93 @@ fn main() {
 					}
 				};
 
+				// AI FIRST SHOT
 				if ai_move {
-					// (pos_x,pos_y) = ai::shoot()
-					// let hit_type = game::get_hit_type(&board_secret, pos_x, pos_y);
-					// board_me = movement::place_entity(board_me, pos_x, pos_y, &1, &Rotation:Horizontal, Damage | Shot)
-					// history.set_history(&format!("Shoot at {} results in Empty/Damage", gui::get_coord(pos_x, pos_y)), history::Actor::Ai);
-					// sleep(1)
-					// if hit
-					// -> ai::shoot_after_hit(previous_shots)
-					// -> game::get_hit_type(&board, pos_x, pos_y)
-					// -> sleep(1)
-					// -> call itself
+					let mut another_turn = false;
+					let (ai_pos_x, ai_pos_y) = ai::shoot(&board_me);
+					let hit_type = game::get_hit_type(&board_me, &board_me, ai_pos_x, ai_pos_y);
+
+					match hit_type {
+						game::HitType::Hit => {
+							history.set_history(
+								&format!("Shoot at {} and hit a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
+								history::Actor::Ai,
+							);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+							another_turn = true;
+						}
+						game::HitType::HitNSunk => {
+							history.set_history(
+								&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
+								history::Actor::Ai,
+							);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+						}
+						game::HitType::Miss => {
+							history.set_history(
+								&format!("Shoot at {} and missed", gui::get_coord(ai_pos_x, ai_pos_y)),
+								history::Actor::Ai,
+							);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Shot);
+						}
+					};
+
+					write!(
+						stdout,
+						"{}{}{}{}{}{}{}",
+						termion::cursor::Goto(1, header_height - 1),
+						termion::clear::AfterCursor,
+						gui::get_score(board_me, board_ai, true),
+						gui::get_board(board_me, board_ai),
+						history.get_history(),
+						gui::get_round2_instructions(),
+						termion::cursor::Restore,
+					)
+					.unwrap();
+					stdout.flush().unwrap();
+
+					// AI SHOT AFTER HIT
+					while another_turn {
+						another_turn = false; // TODO: disable
+						thread::sleep(time::Duration::from_millis(2000));
+						history.set_history(
+							&format!("Shoot at {} again and is now wondering why", gui::get_coord(pos_x, pos_y)),
+							history::Actor::Ai,
+						);
+						// let (ai_pos_x, ai_pos_y) = ai::shoot_after_hit(&board_me);
+						// let hit_type = game::get_hit_type(&board_me, &board_me, ai_pos_x, ai_pos_y);
+
+						// match hit_type {
+						// 	game::HitType::Hit => {
+						// 		history.set_history(&format!("Shoot at {} and hit a ship", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
+						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+						// 	}
+						// 	game::HitType::HitNSunk => {
+						// 		history.set_history(&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
+						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+						// 		another_turn = false;
+						// 	}
+						// 	game::HitType::Miss => {
+						// 		history.set_history(&format!("Shoot at {} and missed", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
+						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Shot);
+						// 		another_turn = false;
+						// 	}
+						// };
+
+						write!(
+							stdout,
+							"{}{}{}{}{}{}{}",
+							termion::cursor::Goto(1, header_height - 1),
+							termion::clear::AfterCursor,
+							gui::get_score(board_me, board_ai, true),
+							gui::get_board(board_me, board_ai),
+							history.get_history(),
+							gui::get_round2_instructions(),
+							termion::cursor::Restore,
+						)
+						.unwrap();
+						stdout.flush().unwrap();
+					}
 				}
 
 				let (x, y) = movement::get_next_available_coordinates(&board_ai, &1, &Rotation::Horizontal);

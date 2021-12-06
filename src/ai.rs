@@ -62,3 +62,27 @@ fn set_ships_works() {
 		config::SHIP_ONE_BLOCK_AMOUNT + (config::SHIP_TWO_BLOCK_AMOUNT * 2) + (config::SHIP_THREE_BLOCK_AMOUNT * 3);
 	assert_eq!(ships, amount);
 }
+
+pub fn shoot(board: &[[Cell; 10]; 10]) -> (usize, usize) {
+	let mut valid_shot = false;
+	let mut pos_x: usize = 0;
+	let mut pos_y: usize = 0;
+
+	while !valid_shot {
+		pos_x = rand::thread_rng().gen_range(0..10);
+		pos_y = rand::thread_rng().gen_range(0..10);
+
+		if board[pos_y][pos_x] != Cell::Shot && board[pos_y][pos_x] != Cell::Damage {
+			valid_shot = true;
+		}
+	}
+
+	(pos_x, pos_y)
+}
+
+pub fn shoot_after_hit(board: &[[Cell; 10]; 10], previous_hits: ([usize; 2])) -> (usize, usize) {
+	let mut pos_x: usize = 0;
+	let mut pos_y: usize = 0;
+
+	(pos_x, pos_y)
+}
