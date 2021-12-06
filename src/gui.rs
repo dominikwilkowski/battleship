@@ -138,3 +138,27 @@ pub fn get_round2_instructions() -> String {
 		color::Fg(color::Reset),
 	))
 }
+
+pub fn get_good_bye_msg(winner: bool) -> String {
+	let mut result = String::new();
+	if winner {
+		result += "Congrats!\r\n";
+		result += &format!("{}", color::Fg(color::Green));
+		result += " ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┏┓┏┓┏┓ ┏━━┓ ┏━┓\r\n";
+		result += " ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┗┛┗┛┃ ┃┏┓┃ ┃┏┓┓\r\n";
+		result += " ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┗┓┏┓┏┛ ┃┗┛┃ ┃┃┃┃\r\n";
+		result += " ┗━━┛  ┗━━┛ ┗━━┛     ┗┛┗┛  ┗━━┛ ┗┛┗┛\r\n";
+		result += &format!("{}", color::Fg(color::Reset));
+	} else {
+		result += &format!("{}", color::Fg(color::Green));
+		result += "                    ┏┓             ┏┓\r\n";
+		result += " ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┃┃  ┏━━┓ ┏━━┓ ┏┛┗┓\r\n";
+		result += " ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┃  ┃┏┓┃ ┃━━┫ ┗┓┏┛\r\n";
+		result += " ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┃┗┓ ┃┗┛┃ ┣━━┃  ┃┗┓\r\n";
+		result += " ┗━━┛  ┗━━┛ ┗━━┛    ┗━┛ ┗━━┛ ┗━━┛  ┗━┛\r\n";
+		result += &format!("{}", color::Fg(color::Reset));
+		result += "Try again soon.\r\n";
+	}
+
+	result
+}

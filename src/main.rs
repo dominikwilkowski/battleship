@@ -288,6 +288,13 @@ fn main() {
 				pos_x = x;
 				pos_y = y;
 				board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Placeholder);
+
+				let score_me = game::get_score(&board_ai);
+				let score_ai = game::get_score(&board_me);
+
+				if score_me == String::from("10") || score_ai == String::from("10") {
+					is_round_two_done = true;
+				}
 			}
 			// MOVEMENT
 			Key::Left => {
@@ -332,9 +339,16 @@ fn main() {
 		stdout.flush().unwrap();
 
 		if is_round_two_done {
+			if game::get_score(&board_ai) == String::from("10") {
+				write!(stdout, "{}\r\n", gui::get_good_bye_msg(true)).unwrap();
+			} else {
+				write!(stdout, "{}\r\n", gui::get_good_bye_msg(false)).unwrap();
+			}
+
 			break;
 		}
 	}
 
 	write!(stdout, "{}", termion::cursor::Show).unwrap();
+	stdout.flush().unwrap();
 }
