@@ -141,39 +141,55 @@ pub fn move_crosshair(
 ) -> ([[Cell; 10]; 10], usize, usize) {
 	match direction {
 		Direction::Left => {
-			if is_free_space(&board, pos_x as isize - 1, pos_y as isize, &1, &Rotation::Horizontal) {
-				// clear previous position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
-				pos_x -= 1;
-				// set new position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+			for i in (0..pos_x).rev() {
+				let new_pos_x = i as isize;
+				if is_free_space(&board, new_pos_x, pos_y as isize, &1, &Rotation::Horizontal) {
+					// clear previous position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
+					pos_x = new_pos_x as usize;
+					// set new position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+					break;
+				}
 			}
 		}
 		Direction::Right => {
-			if is_free_space(&board, pos_x as isize + 1, pos_y as isize, &1, &Rotation::Horizontal) {
-				// clear previous position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
-				pos_x += 1;
-				// set new position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+			for i in pos_x..10 {
+				let new_pos_x = i as isize;
+				if is_free_space(&board, new_pos_x, pos_y as isize, &1, &Rotation::Horizontal) {
+					// clear previous position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
+					pos_x = new_pos_x as usize;
+					// set new position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+					break;
+				}
 			}
 		}
 		Direction::Up => {
-			if is_free_space(&board, pos_x as isize, pos_y as isize - 1, &1, &Rotation::Horizontal) {
-				// clear previous position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
-				pos_y -= 1;
-				// set new position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+			for i in (0..pos_y).rev() {
+				let new_pos_y = i as isize;
+				if is_free_space(&board, pos_x as isize, new_pos_y, &1, &Rotation::Horizontal) {
+					// clear previous position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
+					pos_y = new_pos_y as usize;
+					// set new position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+					break;
+				}
 			}
 		}
 		Direction::Down => {
-			if is_free_space(&board, pos_x as isize, pos_y as isize + 1, &1, &Rotation::Horizontal) {
-				// clear previous position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
-				pos_y += 1;
-				// set new position
-				board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+			for i in pos_y..10 {
+				let new_pos_y = i as isize;
+				if is_free_space(&board, pos_x as isize, new_pos_y, &1, &Rotation::Horizontal) {
+					// clear previous position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Empty);
+					pos_y = new_pos_y as usize;
+					// set new position
+					board = place_entity(board, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+					break;
+				}
 			}
 		}
 	};

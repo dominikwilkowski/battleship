@@ -287,7 +287,7 @@ fn main() {
 				let (x, y) = movement::get_next_available_coordinates(&board_ai, &1, &Rotation::Horizontal);
 				pos_x = x;
 				pos_y = y;
-				board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Placeholder);
+				board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
 
 				let score_me = game::get_score(&board_ai);
 				let score_ai = game::get_score(&board_me);
