@@ -122,21 +122,19 @@ fn get_coord_works() {
 }
 
 pub fn get_round1_instructions() -> String {
-	String::from(
-		format!(
-			"\r\n{}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n[←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
-			color::Fg(color::Green),
-			color::Fg(color::Reset),
-		)
+	format!(
+		"\r\n{}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n[←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
+		color::Fg(color::Green),
+		color::Fg(color::Reset),
 	)
 }
 
 pub fn get_round2_instructions() -> String {
-	String::from(format!(
+	format!(
 		"\r\n{}PLAY - Hit all your opponents ships and reach a score of 10 to win{}\r\n\r\n[←↑↓→] position ║ [enter] shoot ║ [q] quit\r\n\r\n",
 		color::Fg(color::Green),
 		color::Fg(color::Reset),
-	))
+	)
 }
 
 pub fn get_good_bye_msg(winner: bool) -> String {

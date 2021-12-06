@@ -12,11 +12,8 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 
 	for row in board {
 		for cell in row {
-			match cell {
-				Cell::Damage => {
-					score += 1;
-				}
-				_ => {}
+			if cell == &Cell::Damage {
+				score += 1;
 			}
 		}
 	}

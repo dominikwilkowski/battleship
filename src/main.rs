@@ -69,7 +69,7 @@ fn main() {
 
 	// let the AI generate their own ship placements
 	board_secret = ai::set_ships(board_secret);
-	// board_ai = board_secret; // to visualize the ai board instantly
+	let mut ai_attack = ai::Attack::new();
 
 	// the ships to be placed
 	let mut ships =
@@ -85,7 +85,7 @@ fn main() {
 	let mut pos_y: usize = 0;
 
 	// placing our first ship
-	board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
+	board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Placeholder);
 
 	// GUI
 	let header = gui::get_header();
@@ -127,17 +127,17 @@ fn main() {
 					Rotation::Vertical => Rotation::Horizontal,
 				};
 
-				if movement::is_free_space(&board_me, pos_x as isize, pos_y as isize, &ship_size, &new_rotation) {
+				if movement::is_free_space(&board_me, pos_x as isize, pos_y as isize, ship_size, &new_rotation) {
 					// reset previous placement
-					board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Empty);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Empty);
 					rotation = new_rotation;
 					// now place new ship in new rotation
-					board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
+					board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Placeholder);
 				}
 			}
 			// PLACE SHIP
 			Key::Char('\n') => {
-				board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Cell::Ship);
+				board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Cell::Ship);
 
 				ships.set_ship(&this_ship);
 				match ships.get_next_unset_ship() {
@@ -145,10 +145,10 @@ fn main() {
 						this_ship = kind;
 						ship_size = config::get_entitie_size(&this_ship);
 						// collision detection for new pos_x and pos_y
-						let (x, y) = movement::get_next_available_coordinates(&board_me, &ship_size, &rotation);
+						let (x, y) = movement::get_next_available_coordinates(&board_me, ship_size, &rotation);
 						pos_x = x;
 						pos_y = y;
-						board_me = movement::place_entity(board_me, pos_x, pos_y, &ship_size, &rotation, Placeholder);
+						board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Placeholder);
 					}
 					None => {
 						is_round_one_done = true;
@@ -158,28 +158,28 @@ fn main() {
 			// MOVEMENT
 			Key::Left => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Left);
+					movement::move_ship(board_me, pos_x, pos_y, ship_size, &rotation, Direction::Left);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Right => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Right);
+					movement::move_ship(board_me, pos_x, pos_y, ship_size, &rotation, Direction::Right);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Up => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Up);
+					movement::move_ship(board_me, pos_x, pos_y, ship_size, &rotation, Direction::Up);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
 			}
 			Key::Down => {
 				let (board_new, pos_x_new, pos_y_new) =
-					movement::move_ship(board_me, pos_x, pos_y, &rotation, &ship_size, Direction::Down);
+					movement::move_ship(board_me, pos_x, pos_y, ship_size, &rotation, Direction::Down);
 				board_me = board_new;
 				pos_x = pos_x_new;
 				pos_y = pos_y_new;
@@ -195,7 +195,7 @@ fn main() {
 				rotation = Rotation::Horizontal;
 				pos_x = 0;
 				pos_y = 0;
-				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, &ship_size, &rotation, Placeholder);
+				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, ship_size, &rotation, Placeholder);
 			}
 			_ => {}
 		}
@@ -217,7 +217,7 @@ fn main() {
 
 	pos_x = 0;
 	pos_y = 0;
-	board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+	board_ai = movement::place_entity(board_ai, pos_x, pos_y, 1, &Rotation::Horizontal, Crosshair);
 	history.set_history("Placed ships", history::Actor::Me);
 	history.set_history("Placed ships", history::Actor::Ai);
 
@@ -256,19 +256,19 @@ fn main() {
 					game::HitType::Hit => {
 						history
 							.set_history(&format!("Shoot at {} and hit a ship", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
-						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Damage);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, 1, &Rotation::Horizontal, Damage);
 					}
 					game::HitType::HitNSunk => {
 						history.set_history(
 							&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(pos_x, pos_y)),
 							history::Actor::Me,
 						);
-						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Damage);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, 1, &Rotation::Horizontal, Damage);
 						ai_move = true;
 					}
 					game::HitType::Miss => {
 						history.set_history(&format!("Shoot at {} and missed", gui::get_coord(pos_x, pos_y)), history::Actor::Me);
-						board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Shot);
+						board_ai = movement::place_entity(board_ai, pos_x, pos_y, 1, &Rotation::Horizontal, Shot);
 						ai_move = true;
 					}
 				};
@@ -276,7 +276,7 @@ fn main() {
 				// AI FIRST SHOT
 				if ai_move {
 					let mut another_turn = false;
-					let (ai_pos_x, ai_pos_y) = ai::shoot(&board_me);
+					let (ai_pos_x, ai_pos_y) = ai_attack.shoot(&board_me);
 					let hit_type = game::get_hit_type(&board_me, &board_me, ai_pos_x, ai_pos_y);
 
 					match hit_type {
@@ -285,7 +285,7 @@ fn main() {
 								&format!("Shoot at {} and hit a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
 								history::Actor::Ai,
 							);
-							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Damage);
 							another_turn = true;
 						}
 						game::HitType::HitNSunk => {
@@ -293,14 +293,14 @@ fn main() {
 								&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
 								history::Actor::Ai,
 							);
-							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Damage);
 						}
 						game::HitType::Miss => {
 							history.set_history(
 								&format!("Shoot at {} and missed", gui::get_coord(ai_pos_x, ai_pos_y)),
 								history::Actor::Ai,
 							);
-							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Shot);
+							board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Shot);
 						}
 					};
 
@@ -320,31 +320,36 @@ fn main() {
 
 					// AI SHOT AFTER HIT
 					while another_turn {
-						another_turn = false; // TODO: disable
 						thread::sleep(time::Duration::from_millis(2000));
-						history.set_history(
-							&format!("Shoot at {} again and is now wondering why", gui::get_coord(pos_x, pos_y)),
-							history::Actor::Ai,
-						);
-						// let (ai_pos_x, ai_pos_y) = ai::shoot_after_hit(&board_me);
-						// let hit_type = game::get_hit_type(&board_me, &board_me, ai_pos_x, ai_pos_y);
 
-						// match hit_type {
-						// 	game::HitType::Hit => {
-						// 		history.set_history(&format!("Shoot at {} and hit a ship", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
-						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
-						// 	}
-						// 	game::HitType::HitNSunk => {
-						// 		history.set_history(&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
-						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Damage);
-						// 		another_turn = false;
-						// 	}
-						// 	game::HitType::Miss => {
-						// 		history.set_history(&format!("Shoot at {} and missed", gui::get_coord(ai_pos_x, ai_pos_y)), history::Actor::Ai);
-						// 		board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, &1, &Rotation::Horizontal, Shot);
-						// 		another_turn = false;
-						// 	}
-						// };
+						let (ai_pos_x, ai_pos_y) = ai_attack.shoot_after_hit(&board_me);
+						let hit_type = game::get_hit_type(&board_me, &board_me, ai_pos_x, ai_pos_y);
+
+						match hit_type {
+							game::HitType::Hit => {
+								history.set_history(
+									&format!("Shoot at {} and hit a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
+									history::Actor::Ai,
+								);
+								board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Damage);
+							}
+							game::HitType::HitNSunk => {
+								history.set_history(
+									&format!("Shoot at {} and hit and sunk a ship", gui::get_coord(ai_pos_x, ai_pos_y)),
+									history::Actor::Ai,
+								);
+								board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Damage);
+								another_turn = false;
+							}
+							game::HitType::Miss => {
+								history.set_history(
+									&format!("Shoot at {} and missed", gui::get_coord(ai_pos_x, ai_pos_y)),
+									history::Actor::Ai,
+								);
+								board_me = movement::place_entity(board_me, ai_pos_x, ai_pos_y, 1, &Rotation::Horizontal, Shot);
+								another_turn = false;
+							}
+						};
 
 						write!(
 							stdout,
@@ -362,15 +367,15 @@ fn main() {
 					}
 				}
 
-				let (x, y) = movement::get_next_available_coordinates(&board_ai, &1, &Rotation::Horizontal);
+				let (x, y) = movement::get_next_available_coordinates(&board_ai, 1, &Rotation::Horizontal);
 				pos_x = x;
 				pos_y = y;
-				board_ai = movement::place_entity(board_ai, pos_x, pos_y, &1, &Rotation::Horizontal, Crosshair);
+				board_ai = movement::place_entity(board_ai, pos_x, pos_y, 1, &Rotation::Horizontal, Crosshair);
 
 				let score_me = game::get_score(&board_ai);
 				let score_ai = game::get_score(&board_me);
 
-				if score_me == String::from("10") || score_ai == String::from("10") {
+				if score_me == *"10" || score_ai == *"10" {
 					is_round_two_done = true;
 				}
 			}
@@ -417,7 +422,7 @@ fn main() {
 		stdout.flush().unwrap();
 
 		if is_round_two_done {
-			if game::get_score(&board_ai) == String::from("10") {
+			if game::get_score(&board_ai) == *"10" {
 				write!(stdout, "{}\r\n", gui::get_good_bye_msg(true)).unwrap();
 			} else {
 				write!(stdout, "{}\r\n", gui::get_good_bye_msg(false)).unwrap();
