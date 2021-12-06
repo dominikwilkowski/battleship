@@ -249,7 +249,7 @@ fn main() {
 			// SHOOT
 			Key::Char('\n') => {
 				let mut ai_move = false;
-				let hit_type = game::get_hit_type(&board_secret, pos_x, pos_y);
+				let hit_type = game::get_hit_type(&board_ai, &board_secret, pos_x, pos_y);
 				match hit_type {
 					game::HitType::Hit => {
 						history
