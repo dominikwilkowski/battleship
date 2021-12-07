@@ -148,7 +148,7 @@ pub fn get_good_bye_msg(winner: bool) -> String {
 		result += " ┗━━┛  ┗━━┛ ┗━━┛     ┗┛┗┛  ┗━━┛ ┗┛┗┛\r\n";
 		result += &format!("{}", color::Fg(color::Reset));
 	} else {
-		result += &format!("{}", color::Fg(color::Green));
+		result += &format!("{}", color::Fg(color::Red));
 		result += "                    ┏┓             ┏┓\r\n";
 		result += " ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┃┃  ┏━━┓ ┏━━┓ ┏┛┗┓\r\n";
 		result += " ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┃  ┃┏┓┃ ┃━━┫ ┗┓┏┛\r\n";
