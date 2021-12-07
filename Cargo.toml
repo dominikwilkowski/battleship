@@ -3,6 +3,13 @@ name = "battleship"
 version = "1.0.0"
 edition = "2021"
 authors = ["Dominik Wilkowski <Hi@Dominik-Wilkowski.com>"]
+license = "GPL-3.0"
+description = "A battleship game for your ANSI shell"
+readme = "README.md"
+homepage = "https://github.com/dominikwilkowski/battleship"
+repository = "https://github.com/dominikwilkowski/battleship"
+keywords = ["cli", "battleship", "game", "ANSI"]
+categories = ["games", "command-line-interface"]
 
 [dependencies]
 rand = "0.8.4"
