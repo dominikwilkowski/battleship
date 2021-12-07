@@ -7,6 +7,7 @@
 ## How to play
 
 In your ANSI shell run `cargo install battleship`.
+Once installed you can play the game by running `battleship`.
 
 ## How to contribute
 
