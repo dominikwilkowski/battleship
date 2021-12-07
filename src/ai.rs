@@ -103,7 +103,7 @@ impl Attack {
 		(pos_x, pos_y)
 	}
 
-	pub fn shoot_after_hit(&self, board: &[[Cell; 10]; 10]) -> (usize, usize) {
+	pub fn shoot_after_hit(&mut self, board: &[[Cell; 10]; 10]) -> (usize, usize) {
 		let mut possible_shots: Vec<[usize; 2]> = vec![];
 
 		let (last_x, last_y, _) = &self.history[self.history.len() - 1];
@@ -162,6 +162,18 @@ impl Attack {
 		} else {
 			0
 		};
+
+		self.history.push((
+			possible_shots[index][0],
+			possible_shots[index][1],
+			game::get_hit_type(board, board, possible_shots[index][0], possible_shots[index][1]),
+		));
+
+		if game::get_hit_type(board, board, possible_shots[index][0], possible_shots[index][1]) == game::HitType::Miss {
+			for coords in &possible_shots {
+				self.todo.push((coords[0], coords[1]));
+			}
+		}
 
 		(possible_shots[index][0], possible_shots[index][1])
 	}
