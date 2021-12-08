@@ -45,8 +45,12 @@ pub fn get_header() -> String {
 		color::Fg(color::Rgb(93, 156, 233)),
 		reset
 	);
-	let logo6 =
-		format!("{}                                            {:>8} ┗┛{}", color::Fg(color::Rgb(93, 156, 233)), config::VERSION, reset);
+	let logo6 = format!(
+		"{}                                            {:>8} ┗┛{}",
+		color::Fg(color::Rgb(93, 156, 233)),
+		config::VERSION,
+		reset
+	);
 
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
