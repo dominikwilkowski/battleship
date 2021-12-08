@@ -1,5 +1,7 @@
 use crate::Ship;
 
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 // SIZE
 pub const MIN_WIDTH: u16 = 80;
 pub const MIN_HEIGHT: u16 = 35;
