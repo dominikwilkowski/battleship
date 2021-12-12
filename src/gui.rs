@@ -7,27 +7,6 @@ use crate::Cell;
 use termion::color;
 use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, ShipOne, ShipThree, ShipTwo, Shot};
 
-// return one line of a board and interpret states to visual styles
-fn get_board_line(board: &[Cell; 10]) -> String {
-	let mut output = String::new();
-
-	for (i, item) in board.iter().enumerate() {
-		match item {
-			Empty => match i % 2 {
-				0 => output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset)),
-				_ => output += config::EMPTY,
-			},
-			Shot => output += config::SHOT,
-			Ship | ShipOne(_) | ShipTwo(_) | ShipThree(_) => output += config::SHIP,
-			Damage => output += config::DAMAGE,
-			Placeholder => output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White)),
-			Crosshair => output += &format!("{}{}{}", color::Fg(color::Green), config::CROSSHAIR, color::Fg(color::White)),
-		}
-	}
-
-	output
-}
-
 pub fn get_header() -> String {
 	let reset = color::Fg(color::Reset);
 	let logo1 = format!("{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", color::Fg(color::White), reset);
@@ -76,21 +55,68 @@ pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], show_sc
 	)
 }
 
-pub fn get_board(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10]) -> String {
+// return one line of a board and interpret states to visual styles
+fn get_board_row(
+	board_row: &[Cell; 10],
+	y: usize,
+	pos_x: usize,
+	pos_y: usize,
+	cell: Cell,
+	show_position: bool,
+) -> String {
+	let mut output = String::new();
+
+	for (x, item) in board_row.iter().enumerate() {
+		match (item, x, y) {
+			(_, this_pos_x, this_pos_y) if this_pos_x == pos_x && this_pos_y == pos_y && show_position => {
+				match (board_row[x], cell) {
+					(Empty, Crosshair) => {
+						output += &format!("{}{}{}", color::Fg(color::Green), config::CROSSHAIR, color::Fg(color::White))
+					}
+					(Empty, _) => output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White)),
+					(_, Crosshair) => {
+						output += &format!("{}{}{}", color::Fg(color::Red), config::CROSSHAIR, color::Fg(color::White))
+					}
+					(_, _) => output += &format!("{}{}{}", color::Fg(color::Red), config::SHIP, color::Fg(color::White)),
+				}
+			}
+			(Placeholder, _, _) => {
+				output += &format!("{}{}{}", color::Fg(color::Green), config::SHIP, color::Fg(color::White))
+			}
+			(Shot, _, _) => output += config::SHOT,
+			(Ship, _, _) | (ShipOne(_), _, _) | (ShipTwo(_), _, _) | (ShipThree(_), _, _) => output += config::SHIP,
+			(Damage, _, _) => output += config::DAMAGE,
+			(_, _, _) => match x % 2 {
+				0 => output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset)),
+				_ => output += config::EMPTY,
+			},
+		}
+	}
+
+	output
+}
+
+pub fn get_board(
+	board_me: &[[Cell; 10]; 10],
+	board_ai: &[[Cell; 10]; 10],
+	pos_x: usize,
+	pos_y: usize,
+	is_first_round: bool,
+) -> String {
 	let coord_top = "   1  2  3  4  5  6  7  8  9  10   ║     1  2  3  4  5  6  7  8  9  10";
 	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
 	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
 
 	let mut output = format!("{}{}\r\n{}\r\n", color::Fg(color::White), coord_top, frame_top);
-	for i in 0..10 {
-		output += coord_dict[i];
+	for row in 0..10 {
+		output += coord_dict[row];
 		output += "│";
-		output += &get_board_line(&board_me[i]);
+		output += &get_board_row(&board_me[row], row, pos_x, pos_y, Empty, false);
 		output += "│  ║  ";
-		output += coord_dict[i];
+		output += coord_dict[row];
 		output += "│";
-		output += &get_board_line(&board_ai[i]);
+		output += &get_board_row(&board_ai[row], row, pos_x, pos_y, Crosshair, !is_first_round);
 		output += "│\r\n";
 	}
 	output += frame_bottom;

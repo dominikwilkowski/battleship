@@ -293,14 +293,12 @@ pub fn place_entity(
 			for offset in 0..ship_size {
 				coords.push(pos_x as u8 + offset as u8);
 				coords.push(pos_y as u8);
-				// board[pos_y][pos_x + offset] = cell;
 			}
 		}
 		Rotation::Vertical => {
 			for offset in 0..ship_size {
 				coords.push(pos_x as u8);
 				coords.push(pos_y as u8 + offset as u8);
-				// board[pos_y + offset][pos_x] = cell;
 			}
 		}
 	}
@@ -385,7 +383,7 @@ pub fn is_free_space(
 ) -> bool {
 	let mut result = true;
 
-	if temp_pos_x < 0 || temp_pos_y < 0 {
+	if temp_pos_x < 0 || temp_pos_y < 0 || temp_pos_x > 9 || temp_pos_y > 9 {
 		return false;
 	}
 
