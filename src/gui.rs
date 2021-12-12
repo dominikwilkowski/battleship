@@ -204,24 +204,26 @@ pub fn get_round2_instructions() -> String {
 }
 
 pub fn get_good_bye_msg(winner: bool) -> String {
+	let padding = get_padding();
+
 	let mut result = String::new();
 	if winner {
-		result += "Congrats!\r\n";
+		result += &format!("{}Congrats!\r\n", padding);
 		result += &format!("{}", color::Fg(color::Green));
-		result += " ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┏┓┏┓┏┓ ┏━━┓ ┏━┓\r\n";
-		result += " ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┗┛┗┛┃ ┃┏┓┃ ┃┏┓┓\r\n";
-		result += " ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┗┓┏┓┏┛ ┃┗┛┃ ┃┃┃┃\r\n";
-		result += " ┗━━┛  ┗━━┛ ┗━━┛     ┗┛┗┛  ┗━━┛ ┗┛┗┛\r\n";
+		result += &format!("{} ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┏┓┏┓┏┓ ┏━━┓ ┏━┓\r\n", padding);
+		result += &format!("{} ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┗┛┗┛┃ ┃┏┓┃ ┃┏┓┓\r\n", padding);
+		result += &format!("{} ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┗┓┏┓┏┛ ┃┗┛┃ ┃┃┃┃\r\n", padding);
+		result += &format!("{} ┗━━┛  ┗━━┛ ┗━━┛     ┗┛┗┛  ┗━━┛ ┗┛┗┛\r\n", padding);
 		result += &format!("{}", color::Fg(color::Reset));
 	} else {
 		result += &format!("{}", color::Fg(color::Red));
-		result += "                    ┏┓             ┏┓\r\n";
-		result += " ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┃┃  ┏━━┓ ┏━━┓ ┏┛┗┓\r\n";
-		result += " ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┃  ┃┏┓┃ ┃━━┫ ┗┓┏┛\r\n";
-		result += " ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┃┗┓ ┃┗┛┃ ┣━━┃  ┃┗┓\r\n";
-		result += " ┗━━┛  ┗━━┛ ┗━━┛    ┗━┛ ┗━━┛ ┗━━┛  ┗━┛\r\n";
+		result += &format!("{}                    ┏┓             ┏┓\r\n", padding);
+		result += &format!("{} ┏┓ ┏┓ ┏━━┓ ┏┓┏┓    ┃┃  ┏━━┓ ┏━━┓ ┏┛┗┓\r\n", padding);
+		result += &format!("{} ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┃  ┃┏┓┃ ┃━━┫ ┗┓┏┛\r\n", padding);
+		result += &format!("{} ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┃┗┓ ┃┗┛┃ ┣━━┃  ┃┗┓\r\n", padding);
+		result += &format!("{} ┗━━┛  ┗━━┛ ┗━━┛    ┗━┛ ┗━━┛ ┗━━┛  ┗━┛\r\n", padding);
 		result += &format!("{}", color::Fg(color::Reset));
-		result += "Try again soon.\r\n";
+		result += &format!("{}Try again soon.\r\n", padding);
 	}
 
 	result
