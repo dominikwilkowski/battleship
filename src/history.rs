@@ -1,5 +1,7 @@
 extern crate termion;
 
+use crate::gui;
+
 use termion::color;
 
 #[derive(Debug)]
@@ -40,23 +42,25 @@ impl History {
 	}
 
 	pub fn get_history(&self) -> String {
+		let padding = gui::get_padding();
 		let latest = self.get_hisory_slice();
-		let mut output = String::from(" HISTORY\r\n");
-		output += " ┌────────────────────────────────────────────────────────────────────┐\r\n";
-		output += &format!(" │ {:<80} │\r\n", latest[0]);
+
+		let mut output = format!("{} HISTORY\r\n", padding);
+		output += &format!("{} ┌────────────────────────────────────────────────────────────────────┐\r\n", padding);
+		output += &format!("{} │ {:<80} │\r\n", padding, latest[0]);
 		let msg2 = if latest.len() > 1 {
 			latest[1].clone()
 		} else {
 			format!("{}{}", color::Fg(color::White), color::Fg(color::Reset))
 		};
-		output += &format!(" │ {:<80} │\r\n", msg2);
+		output += &format!("{} │ {:<80} │\r\n", padding, msg2);
 		let msg3 = if latest.len() > 2 {
 			latest[2].clone()
 		} else {
 			format!("{}{}", color::Fg(color::White), color::Fg(color::Reset))
 		};
-		output += &format!(" │ {:<80} │\r\n", msg3);
-		output += " └────────────────────────────────────────────────────────────────────┘\r\n";
+		output += &format!("{} │ {:<80} │\r\n", padding, msg3);
+		output += &format!("{} └────────────────────────────────────────────────────────────────────┘\r\n", padding);
 
 		output
 	}

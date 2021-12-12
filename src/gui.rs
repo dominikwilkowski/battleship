@@ -7,34 +7,60 @@ use crate::Cell;
 use termion::color;
 use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, ShipOne, ShipThree, ShipTwo, Shot};
 
+pub fn get_padding() -> String {
+	let mut padding: f32 = 0.0;
+	let size = termion::terminal_size();
+	if let Ok((width, _)) = size {
+		padding = ((width as f32 - 71.0) / 2.0).floor();
+	}
+
+	format!("{:width$}", "", width = padding as usize)
+}
+
 pub fn get_header() -> String {
+	let padding = get_padding();
 	let reset = color::Fg(color::Reset);
-	let logo1 = format!("{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", color::Fg(color::White), reset);
-	let logo2 =
-		format!("{}           ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}", color::Fg(color::White), reset);
-	let logo3 =
-		format!("{}           ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}", color::Fg(color::White), reset);
+
+	let logo1 =
+		format!("{}{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", padding, color::Fg(color::White), reset,);
+	let logo2 = format!(
+		"{}{}           ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}",
+		padding,
+		color::Fg(color::White),
+		reset,
+	);
+	let logo3 = format!(
+		"{}{}           ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}",
+		padding,
+		color::Fg(color::White),
+		reset,
+	);
 	let logo4 = format!(
-		"{}           ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
+		"{}{}           ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
+		padding,
 		color::Fg(color::Rgb(180, 209, 245)),
-		reset
+		reset,
 	);
 	let logo5 = format!(
-		"{}           ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n{}",
+		"{}{}           ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n{}",
+		padding,
 		color::Fg(color::Rgb(93, 156, 233)),
-		reset
+		reset,
 	);
 	let logo6 = format!(
-		"{}                                            {:>8} ┗┛{}",
+		"{}{}                                            {:>8} ┗┛{}",
+		padding,
 		color::Fg(color::Rgb(93, 156, 233)),
 		config::VERSION,
-		reset
+		reset,
 	);
 
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
 
 pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], show_score: bool) -> String {
+	let padding = get_padding();
+
 	let score_me = if show_score {
 		game::get_score(&board_ai)
 	} else {
@@ -47,7 +73,8 @@ pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], show_sc
 	};
 
 	format!(
-		"ME                     {open}SCORE: {score_me}{close}   ║  AI                     {open}SCORE: {score_ai}{close}\r\n",
+		"{}ME                     {open}SCORE: {score_me}{close}   ║  AI                     {open}SCORE: {score_ai}{close}\r\n",
+		padding,
 		open=color::Fg(color::Magenta),
 		close=color::Fg(color::White),
 		score_me=score_me,
@@ -103,13 +130,15 @@ pub fn get_board(
 	pos_y: usize,
 	is_first_round: bool,
 ) -> String {
+	let padding = get_padding();
 	let coord_top = "   1  2  3  4  5  6  7  8  9  10   ║     1  2  3  4  5  6  7  8  9  10";
 	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
 	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
 
-	let mut output = format!("{}{}\r\n{}\r\n", color::Fg(color::White), coord_top, frame_top);
+	let mut output = format!("{}{}{}\r\n{}{}\r\n", padding, color::Fg(color::White), coord_top, padding, frame_top);
 	for row in 0..10 {
+		output += &padding;
 		output += coord_dict[row];
 		output += "│";
 		output += &get_board_row(&board_me[row], row, pos_x, pos_y, Empty, false);
@@ -119,6 +148,7 @@ pub fn get_board(
 		output += &get_board_row(&board_ai[row], row, pos_x, pos_y, Crosshair, !is_first_round);
 		output += "│\r\n";
 	}
+	output += &padding;
 	output += frame_bottom;
 	output += "\r\n\r\n";
 	output += &format!("{}", color::Fg(color::Reset));
@@ -152,18 +182,24 @@ fn get_coord_works() {
 }
 
 pub fn get_round1_instructions() -> String {
+	let padding = get_padding();
 	format!(
-		"\r\n{}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n[←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
+		"\r\n{}{}      PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
+		padding,
 		color::Fg(color::Green),
 		color::Fg(color::Reset),
+		padding,
 	)
 }
 
 pub fn get_round2_instructions() -> String {
+	let padding = get_padding();
 	format!(
-		"\r\n{}PLAY - Hit all your opponents ships and reach a score of 10 to win{}\r\n\r\n[←↑↓→] position ║ [enter] shoot ║ [q] quit\r\n\r\n",
+		"\r\n{}{}   PLAY - Hit all your opponents ships and reach a score of 10 to win{}\r\n\r\n{}              [←↑↓→] position ║ [enter] shoot ║ [q] quit\r\n\r\n",
+		padding,
 		color::Fg(color::Green),
 		color::Fg(color::Reset),
+		padding,
 	)
 }
 
