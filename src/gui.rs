@@ -19,7 +19,7 @@ pub fn get_padding() -> String {
 
 pub fn get_header() -> String {
 	let padding = get_padding();
-	let reset = color::Fg(color::Reset);
+	let reset = color::Fg(color::White);
 
 	let logo1 =
 		format!("{}{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", padding, color::Fg(color::White), reset,);
@@ -38,19 +38,19 @@ pub fn get_header() -> String {
 	let logo4 = format!(
 		"{}{}           ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
 		padding,
-		color::Fg(color::Rgb(180, 209, 245)),
+		color::Fg(color::Cyan),
 		reset,
 	);
 	let logo5 = format!(
 		"{}{}           ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n{}",
 		padding,
-		color::Fg(color::Rgb(93, 156, 233)),
+		color::Fg(color::LightBlue),
 		reset,
 	);
 	let logo6 = format!(
 		"{}{}                                            {:>8} ┗┛{}",
 		padding,
-		color::Fg(color::Rgb(93, 156, 233)),
+		color::Fg(color::LightBlue),
 		config::VERSION,
 		reset,
 	);
@@ -114,8 +114,8 @@ fn get_board_row(
 			(Ship, _, _) | (ShipOne(_), _, _) | (ShipTwo(_), _, _) | (ShipThree(_), _, _) => output += config::SHIP,
 			(Damage, _, _) => output += config::DAMAGE,
 			(_, _, _) => match x % 2 {
-				0 => output += &format!("{}{}{}", color::Fg(color::Rgb(100, 100, 100)), config::EMPTY, color::Fg(color::Reset)),
-				_ => output += config::EMPTY,
+				0 => output += &format!("{}{}{}", color::Fg(color::LightWhite), config::EMPTY, color::Fg(color::White)),
+				_ => output += &format!("{}{}{}", color::Fg(color::LightBlack), config::EMPTY, color::Fg(color::White)),
 			},
 		}
 	}
@@ -151,7 +151,7 @@ pub fn get_board(
 	output += &padding;
 	output += frame_bottom;
 	output += "\r\n\r\n";
-	output += &format!("{}", color::Fg(color::Reset));
+	output += &format!("{}", color::Fg(color::White));
 
 	output
 }
@@ -187,7 +187,7 @@ pub fn get_round1_instructions() -> String {
 		"\r\n{}{}      PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
 		padding,
 		color::Fg(color::Green),
-		color::Fg(color::Reset),
+		color::Fg(color::White),
 		padding,
 	)
 }
@@ -198,7 +198,7 @@ pub fn get_round2_instructions() -> String {
 		"\r\n{}{}   PLAY - Hit all your opponents ships and reach a score of 10 to win{}\r\n\r\n{}              [←↑↓→] position ║ [enter] shoot ║ [q] quit\r\n\r\n",
 		padding,
 		color::Fg(color::Green),
-		color::Fg(color::Reset),
+		color::Fg(color::White),
 		padding,
 	)
 }
@@ -214,7 +214,7 @@ pub fn get_good_bye_msg(winner: bool) -> String {
 		result += &format!("{} ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┗┛┗┛┃ ┃┏┓┃ ┃┏┓┓\r\n", padding);
 		result += &format!("{} ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┗┓┏┓┏┛ ┃┗┛┃ ┃┃┃┃\r\n", padding);
 		result += &format!("{} ┗━━┛  ┗━━┛ ┗━━┛     ┗┛┗┛  ┗━━┛ ┗┛┗┛\r\n", padding);
-		result += &format!("{}", color::Fg(color::Reset));
+		result += &format!("{}", color::Fg(color::White));
 	} else {
 		result += &format!("{}", color::Fg(color::Red));
 		result += &format!("{}                    ┏┓             ┏┓\r\n", padding);
@@ -222,7 +222,7 @@ pub fn get_good_bye_msg(winner: bool) -> String {
 		result += &format!("{} ┃┗━┛┃ ┃┏┓┃ ┃┃┃┃    ┃┃  ┃┏┓┃ ┃━━┫ ┗┓┏┛\r\n", padding);
 		result += &format!("{} ┗━┓┏┛ ┃┗┛┃ ┃┗┛┃    ┃┗┓ ┃┗┛┃ ┣━━┃  ┃┗┓\r\n", padding);
 		result += &format!("{} ┗━━┛  ┗━━┛ ┗━━┛    ┗━┛ ┗━━┛ ┗━━┛  ┗━┛\r\n", padding);
-		result += &format!("{}", color::Fg(color::Reset));
+		result += &format!("{}", color::Fg(color::White));
 		result += &format!("{}Try again soon.\r\n", padding);
 	}
 

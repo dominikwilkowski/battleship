@@ -21,15 +21,15 @@ impl History {
 			archive: vec![format!(
 				"{}- Game started -{}",
 				color::Fg(color::Cyan),
-				color::Fg(color::Reset)
+				color::Fg(color::White)
 			)],
 		}
 	}
 
 	pub fn set_history(&mut self, entry: &str, actor: Actor) {
 		let prefix = match actor {
-			Actor::Ai => format!("{}AI:{}", color::Fg(color::LightRed), color::Fg(color::Reset)),
-			Actor::Me => format!("{}ME:{}", color::Fg(color::Green), color::Fg(color::Reset)),
+			Actor::Ai => format!("{}AI:{}", color::Fg(color::LightRed), color::Fg(color::White)),
+			Actor::Me => format!("{}ME:{}", color::Fg(color::Green), color::Fg(color::White)),
 		};
 
 		self.archive.push(format!("{} {}", prefix, entry));
@@ -47,19 +47,19 @@ impl History {
 
 		let mut output = format!("{} HISTORY\r\n", padding);
 		output += &format!("{} ┌────────────────────────────────────────────────────────────────────┐\r\n", padding);
-		output += &format!("{} │ {:<80} │\r\n", padding, latest[0]);
+		output += &format!("{} │ {:<84} │\r\n", padding, latest[0]);
 		let msg2 = if latest.len() > 1 {
 			latest[1].clone()
 		} else {
-			format!("{}{}", color::Fg(color::White), color::Fg(color::Reset))
+			format!("{}{}", color::Fg(color::White), color::Fg(color::White))
 		};
-		output += &format!("{} │ {:<80} │\r\n", padding, msg2);
+		output += &format!("{} │ {:<84} │\r\n", padding, msg2);
 		let msg3 = if latest.len() > 2 {
 			latest[2].clone()
 		} else {
-			format!("{}{}", color::Fg(color::White), color::Fg(color::Reset))
+			format!("{}{}", color::Fg(color::White), color::Fg(color::White))
 		};
-		output += &format!("{} │ {:<80} │\r\n", padding, msg3);
+		output += &format!("{} │ {:<84} │\r\n", padding, msg3);
 		output += &format!("{} └────────────────────────────────────────────────────────────────────┘\r\n", padding);
 
 		output

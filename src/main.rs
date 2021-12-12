@@ -87,19 +87,18 @@ fn main() {
 	// placing our first ship
 	board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Placeholder);
 
-	// GUI
-	let header = gui::get_header();
-	let header_height: u16 = (header.lines().count() + 3).try_into().unwrap();
+	write!(stdout, "{}", termion::color::Bg(termion::color::Black)).unwrap();
+	stdout.flush().unwrap();
 
 	write!(
 		stdout,
 		"{}{}{}{}{}{}{}{}{}{}",
-		termion::color::Bg(termion::color::Black),
 		termion::clear::All,
 		termion::cursor::Goto(1, 2),
+		termion::color::Fg(termion::color::White),
 		termion::cursor::Hide,
-		header,
-		gui::get_score(board_me, board_secret, false),
+		gui::get_header(),
+		gui::get_score(board_me, board_ai, false),
 		gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 		history.get_history(),
 		gui::get_round1_instructions(),
@@ -112,8 +111,6 @@ fn main() {
 
 	// FIRST ROUND setting ships
 	for key in stdin().keys() {
-		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
-
 		match key.unwrap() {
 			Key::Esc | Key::Char('q') => {
 				write!(stdout, "{}{}", termion::cursor::Restore, termion::cursor::Show).unwrap();
@@ -202,9 +199,16 @@ fn main() {
 
 		write!(
 			stdout,
-			"{}{}{}",
-			termion::cursor::Goto(1, header_height),
+			"{}{}{}{}{}{}{}{}{}{}",
+			termion::cursor::Goto(1, 2),
+			termion::clear::AfterCursor,
+			termion::color::Fg(termion::color::White),
+			termion::cursor::Hide,
+			gui::get_header(),
+			gui::get_score(board_me, board_ai, false),
 			gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
+			history.get_history(),
+			gui::get_round1_instructions(),
 			termion::cursor::Restore,
 		)
 		.unwrap();
@@ -222,10 +226,13 @@ fn main() {
 
 	write!(
 		stdout,
-		"{}{}{}{}{}{}{}",
-		termion::cursor::Goto(1, header_height - 1),
+		"{}{}{}{}{}{}{}{}{}{}",
+		termion::cursor::Goto(1, 2),
 		termion::clear::AfterCursor,
-		gui::get_score(board_me, board_secret, true),
+		termion::color::Fg(termion::color::White),
+		termion::cursor::Hide,
+		gui::get_header(),
+		gui::get_score(board_me, board_ai, true),
 		gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
 		history.get_history(),
 		gui::get_round2_instructions(),
@@ -238,8 +245,6 @@ fn main() {
 
 	// SECOND ROUND shooting turns
 	for key in stdin().keys() {
-		write!(stdout, "{}{}", termion::cursor::Restore, termion::clear::CurrentLine).unwrap();
-
 		match key.unwrap() {
 			Key::Esc | Key::Char('q') => {
 				write!(stdout, "{}{}", termion::cursor::Restore, termion::cursor::Show).unwrap();
@@ -306,9 +311,12 @@ fn main() {
 
 						write!(
 							stdout,
-							"{}{}{}{}{}{}{}",
-							termion::cursor::Goto(1, header_height - 1),
+							"{}{}{}{}{}{}{}{}{}{}",
+							termion::cursor::Goto(1, 2),
 							termion::clear::AfterCursor,
+							termion::color::Fg(termion::color::White),
+							termion::cursor::Hide,
+							gui::get_header(),
 							gui::get_score(board_me, board_ai, true),
 							gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 							history.get_history(),
@@ -353,9 +361,12 @@ fn main() {
 
 							write!(
 								stdout,
-								"{}{}{}{}{}{}{}",
-								termion::cursor::Goto(1, header_height - 1),
+								"{}{}{}{}{}{}{}{}{}{}",
+								termion::cursor::Goto(1, 2),
 								termion::clear::AfterCursor,
+								termion::color::Fg(termion::color::White),
+								termion::cursor::Hide,
+								gui::get_header(),
 								gui::get_score(board_me, board_ai, true),
 								gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 								history.get_history(),
@@ -405,9 +416,12 @@ fn main() {
 
 		write!(
 			stdout,
-			"{}{}{}{}{}{}{}",
-			termion::cursor::Goto(1, header_height - 1),
+			"{}{}{}{}{}{}{}{}{}{}",
+			termion::cursor::Goto(1, 2),
 			termion::clear::AfterCursor,
+			termion::color::Fg(termion::color::White),
+			termion::cursor::Hide,
+			gui::get_header(),
 			gui::get_score(board_me, board_ai, true),
 			gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
 			history.get_history(),
