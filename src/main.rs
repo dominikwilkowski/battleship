@@ -87,13 +87,13 @@ fn main() {
 	// placing our first ship
 	board_me = movement::place_entity(board_me, pos_x, pos_y, ship_size, &rotation, Placeholder);
 
-	write!(stdout, "{}", termion::color::Bg(termion::color::Black)).unwrap();
+	write!(stdout, "{}{}", termion::color::Bg(termion::color::Black), termion::clear::All).unwrap();
 	stdout.flush().unwrap();
 
 	gui::draw(
 		&mut stdout,
-		gui::get_score(board_me, board_ai, false),
-		gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
+		gui::get_score(board_me, board_ai, gui::Round::One),
+		gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::One),
 		history.get_history(),
 		gui::get_round1_instructions(),
 	);
@@ -190,8 +190,8 @@ fn main() {
 
 		gui::draw(
 			&mut stdout,
-			gui::get_score(board_me, board_ai, false),
-			gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
+			gui::get_score(board_me, board_ai, gui::Round::One),
+			gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::One),
 			history.get_history(),
 			gui::get_round1_instructions(),
 		);
@@ -208,8 +208,8 @@ fn main() {
 
 	gui::draw(
 		&mut stdout,
-		gui::get_score(board_me, board_ai, true),
-		gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
+		gui::get_score(board_me, board_ai, gui::Round::Two),
+		gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::Two),
 		history.get_history(),
 		gui::get_round2_instructions(),
 	);
@@ -284,8 +284,8 @@ fn main() {
 
 						gui::draw(
 							&mut stdout,
-							gui::get_score(board_me, board_ai, true),
-							gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
+							gui::get_score(board_me, board_ai, gui::Round::Two),
+							gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::One),
 							history.get_history(),
 							gui::get_round2_instructions(),
 						);
@@ -325,8 +325,8 @@ fn main() {
 
 							gui::draw(
 								&mut stdout,
-								gui::get_score(board_me, board_ai, true),
-								gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
+								gui::get_score(board_me, board_ai, gui::Round::Two),
+								gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::One),
 								history.get_history(),
 								gui::get_round2_instructions(),
 							);
@@ -371,19 +371,14 @@ fn main() {
 
 		gui::draw(
 			&mut stdout,
-			gui::get_score(board_me, board_ai, true),
-			gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
+			gui::get_score(board_me, board_ai, gui::Round::Two),
+			gui::get_board(&board_me, &board_ai, pos_x, pos_y, gui::Round::Two),
 			history.get_history(),
 			gui::get_round2_instructions(),
 		);
 
 		if is_round_two_done {
-			if game::get_score(&board_ai) == *"10" {
-				write!(stdout, "{}\r\n", gui::get_good_bye_msg(true)).unwrap();
-			} else {
-				write!(stdout, "{}\r\n", gui::get_good_bye_msg(false)).unwrap();
-			}
-
+			write!(stdout, "{}\r\n", gui::get_good_bye_msg(game::get_score(&board_ai) == *"10")).unwrap();
 			break;
 		}
 	}

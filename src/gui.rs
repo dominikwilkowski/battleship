@@ -9,6 +9,11 @@ use crate::Cell;
 use termion::color;
 use Cell::{Crosshair, Damage, Empty, Placeholder, Ship, ShipOne, ShipThree, ShipTwo, Shot};
 
+pub enum Round {
+	One,
+	Two,
+}
+
 pub fn get_padding() -> String {
 	let mut padding: f32 = 0.0;
 	let size = termion::terminal_size();
@@ -60,18 +65,17 @@ pub fn get_header() -> String {
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
 
-pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], show_score: bool) -> String {
+pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], round: Round) -> String {
 	let padding = get_padding();
 
-	let score_me = if show_score {
-		game::get_score(&board_ai)
-	} else {
-		String::from("--")
+	let score_me = match round {
+		Round::One => String::from("--"),
+		Round::Two => game::get_score(&board_ai),
 	};
-	let score_ai = if show_score {
-		game::get_score(&board_me)
-	} else {
-		String::from("--")
+
+	let score_ai = match round {
+		Round::One => String::from("--"),
+		Round::Two => game::get_score(&board_me),
 	};
 
 	format!(
@@ -130,13 +134,17 @@ pub fn get_board(
 	board_ai: &[[Cell; 10]; 10],
 	pos_x: usize,
 	pos_y: usize,
-	is_first_round: bool,
+	round: Round,
 ) -> String {
 	let padding = get_padding();
 	let coord_top = "   1  2  3  4  5  6  7  8  9  10   ║     1  2  3  4  5  6  7  8  9  10";
 	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
 	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
+	let show_position = match round {
+		Round::One => false,
+		Round::Two => true,
+	};
 
 	let mut output = format!("{}{}{}\r\n{}{}\r\n", padding, color::Fg(color::White), coord_top, padding, frame_top);
 	for row in 0..10 {
@@ -147,7 +155,7 @@ pub fn get_board(
 		output += "│  ║  ";
 		output += coord_dict[row];
 		output += "│";
-		output += &get_board_row(&board_ai[row], row, pos_x, pos_y, Crosshair, !is_first_round);
+		output += &get_board_row(&board_ai[row], row, pos_x, pos_y, Crosshair, show_position);
 		output += "│\r\n";
 	}
 	output += &padding;
@@ -235,7 +243,7 @@ pub fn draw(stdout: &mut dyn io::Write, score: String, board: String, history: S
 	write!(
 		stdout,
 		"{}{}{}{}{}{}{}{}{}{}",
-		termion::clear::All,
+		termion::clear::AfterCursor,
 		termion::cursor::Goto(1, 2),
 		termion::color::Fg(termion::color::White),
 		termion::cursor::Hide,
