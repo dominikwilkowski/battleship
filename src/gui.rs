@@ -1,5 +1,7 @@
 extern crate termion;
 
+use std::io;
+
 use crate::config;
 use crate::game;
 use crate::Cell;
@@ -227,4 +229,23 @@ pub fn get_good_bye_msg(winner: bool) -> String {
 	}
 
 	result
+}
+
+pub fn draw(stdout: &mut dyn io::Write, score: String, board: String, history: String, instructions: String) {
+	write!(
+		stdout,
+		"{}{}{}{}{}{}{}{}{}{}",
+		termion::clear::All,
+		termion::cursor::Goto(1, 2),
+		termion::color::Fg(termion::color::White),
+		termion::cursor::Hide,
+		get_header(),
+		score,
+		board,
+		history,
+		instructions,
+		termion::cursor::Save
+	)
+	.unwrap();
+	stdout.flush().unwrap();
 }

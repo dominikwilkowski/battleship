@@ -90,22 +90,13 @@ fn main() {
 	write!(stdout, "{}", termion::color::Bg(termion::color::Black)).unwrap();
 	stdout.flush().unwrap();
 
-	write!(
-		stdout,
-		"{}{}{}{}{}{}{}{}{}{}",
-		termion::clear::All,
-		termion::cursor::Goto(1, 2),
-		termion::color::Fg(termion::color::White),
-		termion::cursor::Hide,
-		gui::get_header(),
+	gui::draw(
+		&mut stdout,
 		gui::get_score(board_me, board_ai, false),
 		gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 		history.get_history(),
 		gui::get_round1_instructions(),
-		termion::cursor::Save
-	)
-	.unwrap();
-	stdout.flush().unwrap();
+	);
 
 	let mut is_round_one_done = false;
 
@@ -197,22 +188,13 @@ fn main() {
 			_ => {}
 		}
 
-		write!(
-			stdout,
-			"{}{}{}{}{}{}{}{}{}{}",
-			termion::cursor::Goto(1, 2),
-			termion::clear::AfterCursor,
-			termion::color::Fg(termion::color::White),
-			termion::cursor::Hide,
-			gui::get_header(),
+		gui::draw(
+			&mut stdout,
 			gui::get_score(board_me, board_ai, false),
 			gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 			history.get_history(),
 			gui::get_round1_instructions(),
-			termion::cursor::Restore,
-		)
-		.unwrap();
-		stdout.flush().unwrap();
+		);
 
 		if is_round_one_done {
 			break;
@@ -224,22 +206,13 @@ fn main() {
 	history.set_history("Placed ships", history::Actor::Me);
 	history.set_history("Placed ships", history::Actor::Ai);
 
-	write!(
-		stdout,
-		"{}{}{}{}{}{}{}{}{}{}",
-		termion::cursor::Goto(1, 2),
-		termion::clear::AfterCursor,
-		termion::color::Fg(termion::color::White),
-		termion::cursor::Hide,
-		gui::get_header(),
+	gui::draw(
+		&mut stdout,
 		gui::get_score(board_me, board_ai, true),
 		gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
 		history.get_history(),
 		gui::get_round2_instructions(),
-		termion::cursor::Restore,
-	)
-	.unwrap();
-	stdout.flush().unwrap();
+	);
 
 	let mut is_round_two_done = false;
 
@@ -309,22 +282,13 @@ fn main() {
 							}
 						};
 
-						write!(
-							stdout,
-							"{}{}{}{}{}{}{}{}{}{}",
-							termion::cursor::Goto(1, 2),
-							termion::clear::AfterCursor,
-							termion::color::Fg(termion::color::White),
-							termion::cursor::Hide,
-							gui::get_header(),
+						gui::draw(
+							&mut stdout,
 							gui::get_score(board_me, board_ai, true),
 							gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 							history.get_history(),
 							gui::get_round2_instructions(),
-							termion::cursor::Restore,
-						)
-						.unwrap();
-						stdout.flush().unwrap();
+						);
 
 						// AI SHOT AFTER HIT
 						while another_turn {
@@ -359,22 +323,13 @@ fn main() {
 								}
 							};
 
-							write!(
-								stdout,
-								"{}{}{}{}{}{}{}{}{}{}",
-								termion::cursor::Goto(1, 2),
-								termion::clear::AfterCursor,
-								termion::color::Fg(termion::color::White),
-								termion::cursor::Hide,
-								gui::get_header(),
+							gui::draw(
+								&mut stdout,
 								gui::get_score(board_me, board_ai, true),
 								gui::get_board(&board_me, &board_ai, pos_x, pos_y, true),
 								history.get_history(),
 								gui::get_round2_instructions(),
-								termion::cursor::Restore,
-							)
-							.unwrap();
-							stdout.flush().unwrap();
+							);
 						}
 					}
 
@@ -414,22 +369,13 @@ fn main() {
 			_ => {}
 		}
 
-		write!(
-			stdout,
-			"{}{}{}{}{}{}{}{}{}{}",
-			termion::cursor::Goto(1, 2),
-			termion::clear::AfterCursor,
-			termion::color::Fg(termion::color::White),
-			termion::cursor::Hide,
-			gui::get_header(),
+		gui::draw(
+			&mut stdout,
 			gui::get_score(board_me, board_ai, true),
 			gui::get_board(&board_me, &board_ai, pos_x, pos_y, false),
 			history.get_history(),
 			gui::get_round2_instructions(),
-			termion::cursor::Restore,
-		)
-		.unwrap();
-		stdout.flush().unwrap();
+		);
 
 		if is_round_two_done {
 			if game::get_score(&board_ai) == *"10" {
