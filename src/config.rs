@@ -4,16 +4,16 @@ use crate::Ship;
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // BOARD SIZE
-// MUST BE >8
+// MUST BE >8 <=35
 pub const SIZE_X: usize = 10;
-// MUST BE >3
+// MUST BE >3 <=26
 pub const SIZE_Y: usize = 10;
 pub type BoardRow = [Cell; SIZE_X];
 pub type Board = [BoardRow; SIZE_Y];
 
 // MIN TERMINAL SIZE
-pub const MIN_WIDTH: u16 = 80;
-pub const MIN_HEIGHT: u16 = 35;
+pub const MIN_WIDTH: u16 = SIZE_X as u16 * 3 * 2 + 11;
+pub const MIN_HEIGHT: u16 = 7 + 2 + 1 + SIZE_Y as u16 + 1 + 7 + 4 + 3;
 
 // GUI
 pub const EMPTY: &str = "░░░";
