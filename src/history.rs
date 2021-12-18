@@ -1,5 +1,6 @@
 extern crate termion;
 
+use crate::config;
 use crate::gui;
 
 use termion::color;
@@ -44,23 +45,26 @@ impl History {
 	pub fn get_history(&self) -> String {
 		let padding = gui::get_padding();
 		let latest = self.get_hisory_slice();
+		let board_size = (config::SIZE_X * 3 * 2) + 11;
+		let inner_size = (((board_size * 2) - 5) / 2) as f32;
+		let size = inner_size.floor() as usize;
 
 		let mut output = format!("{} HISTORY\r\n", padding);
-		output += &format!("{} ┌────────────────────────────────────────────────────────────────────┐\r\n", padding);
-		output += &format!("{} │ {:<84} │\r\n", padding, latest[0]);
+		output += &format!("{} ┌{:─^width$}┐\r\n", padding, "", width = size);
+		output += &format!("{} │ {:<width$} │\r\n", padding, latest[0], width = (size + 16));
 		let msg2 = if latest.len() > 1 {
 			latest[1].clone()
 		} else {
 			format!("{}{}", color::Fg(color::White), color::Fg(color::White))
 		};
-		output += &format!("{} │ {:<84} │\r\n", padding, msg2);
+		output += &format!("{} │ {:<width$} │\r\n", padding, msg2, width = (size + 16));
 		let msg3 = if latest.len() > 2 {
 			latest[2].clone()
 		} else {
 			format!("{}{}", color::Fg(color::White), color::Fg(color::White))
 		};
-		output += &format!("{} │ {:<84} │\r\n", padding, msg3);
-		output += &format!("{} └────────────────────────────────────────────────────────────────────┘\r\n", padding);
+		output += &format!("{} │ {:<width$} │\r\n", padding, msg3, width = (size + 16));
+		output += &format!("{} └{:─^width$}┘\r\n", padding, "", width = size);
 
 		output
 	}

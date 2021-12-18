@@ -17,8 +17,10 @@ pub enum Round {
 pub fn get_padding() -> String {
 	let mut padding: f32 = 0.0;
 	let size = termion::terminal_size();
+	let board_size = (config::SIZE_X as f32 * 3.0 * 2.0) + 11.0;
+
 	if let Ok((width, _)) = size {
-		padding = ((width as f32 - 71.0) / 2.0).floor();
+		padding = ((width as f32 - board_size) / 2.0).floor();
 	}
 
 	format!("{:width$}", "", width = padding as usize)
@@ -27,36 +29,49 @@ pub fn get_padding() -> String {
 pub fn get_header() -> String {
 	let padding = get_padding();
 	let reset = color::Fg(color::White);
+	let board_size = (config::SIZE_X * 3 * 2) + 11;
+	let inner_size = ((board_size - 46) / 2) as f32;
+	let inner_padding = format!("{:width$}", "", width = inner_size.floor() as usize);
 
-	let logo1 =
-		format!("{}{}           ┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n", padding, color::Fg(color::White), reset,);
-	let logo2 = format!(
-		"{}{}           ┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}",
+	let logo1 = format!(
+		"{}{}{}┏┓         ┏┓   ┏┓  ┏┓            ┏┓   ┏┓{}\r\n",
 		padding,
+		inner_padding,
+		color::Fg(color::White),
+		reset,
+	);
+	let logo2 = format!(
+		"{}{}{}┃┗━┓ ┏━━┓ ┏┛┗┓ ┏┛┗┓ ┃┃  ┏━━┓ ┏━━┓ ┃┗━┓ ┗┛ ┏━━┓\r\n{}",
+		padding,
+		inner_padding,
 		color::Fg(color::White),
 		reset,
 	);
 	let logo3 = format!(
-		"{}{}           ┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}",
+		"{}{}{}┃┏┓┃ ┃┏┓┃ ┗┓┏┛ ┗┓┏┛ ┃┃  ┃┃━┫ ┃━━┫ ┃┏┓┃ ┏┓ ┃┏┓┃\r\n{}",
 		padding,
+		inner_padding,
 		color::Fg(color::White),
 		reset,
 	);
 	let logo4 = format!(
-		"{}{}           ┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
+		"{}{}{}┃┗┛┃ ┃┏┓┃  ┃┗┓  ┃┗┓ ┃┗┓ ┃┃━┫ ┣━━┃ ┃┃┃┃ ┃┃ ┃┗┛┃\r\n{}",
 		padding,
+		inner_padding,
 		color::Fg(color::Cyan),
 		reset,
 	);
 	let logo5 = format!(
-		"{}{}           ┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n{}",
+		"{}{}{}┗━━┛ ┗┛┗┛  ┗━┛  ┗━┛ ┗━┛ ┗━━┛ ┗━━┛ ┗┛┗┛ ┗┛ ┃┏━┛\r\n{}",
 		padding,
+		inner_padding,
 		color::Fg(color::LightBlue),
 		reset,
 	);
 	let logo6 = format!(
-		"{}{}                                            {:>8} ┗┛{}",
+		"{}{}{}                                 {:>8} ┗┛{}",
 		padding,
+		inner_padding,
 		color::Fg(color::LightBlue),
 		config::VERSION,
 		reset,
@@ -65,7 +80,7 @@ pub fn get_header() -> String {
 	format!("{}{}{}{}{}{}\r\n\r\n", logo1, logo2, logo3, logo4, logo5, logo6)
 }
 
-pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], round: Round) -> String {
+pub fn get_score(board_me: config::Board, board_ai: config::Board, round: Round) -> String {
 	let padding = get_padding();
 
 	let score_me = match round {
@@ -78,9 +93,18 @@ pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], round: 
 		Round::Two => game::get_score(&board_me),
 	};
 
+	let user1 = "ME";
+	let user2 = "AI";
+
+	let inner_size = (config::SIZE_X * 3) + 5 - 15 - 7 - 2 - 3;
+	let inner_padding = &format!("{:width$}", "", width = inner_size);
+
 	format!(
-		"{}ME                     {open}SCORE: {score_me}{close}   ║  AI                     {open}SCORE: {score_ai}{close}\r\n",
+		"{}{:<15}{inner_padding}{open}SCORE: {score_me}{close}   ║  {:<15}{inner_padding}{open}SCORE: {score_ai}{close}\r\n",
 		padding,
+		user1,
+		user2,
+		inner_padding=inner_padding,
 		open=color::Fg(color::Magenta),
 		close=color::Fg(color::White),
 		score_me=score_me,
@@ -90,7 +114,7 @@ pub fn get_score(board_me: [[Cell; 10]; 10], board_ai: [[Cell; 10]; 10], round: 
 
 // return one line of a board and interpret states to visual styles
 fn get_board_row(
-	board_row: &[Cell; 10],
+	board_row: &config::BoardRow,
 	y: usize,
 	pos_x: usize,
 	pos_y: usize,
@@ -130,44 +154,52 @@ fn get_board_row(
 }
 
 pub fn get_board(
-	board_me: &[[Cell; 10]; 10],
-	board_ai: &[[Cell; 10]; 10],
+	board_me: &config::Board,
+	board_ai: &config::Board,
 	pos_x: usize,
 	pos_y: usize,
 	round: Round,
 ) -> String {
 	let padding = get_padding();
-	let coord_top = "   1  2  3  4  5  6  7  8  9  10   ║     1  2  3  4  5  6  7  8  9  10";
-	let frame_top = " ┌──────────────────────────────┐  ║   ┌──────────────────────────────┐";
-	let coord_dict = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-	let frame_bottom = " └──────────────────────────────┘  ║   └──────────────────────────────┘";
+
+	let mut coords = String::from(" ");
+	for i in 1..=config::SIZE_X {
+		coords += &format!(" {:^2}", i);
+	}
+	let coord_top = &format!(" {coords}   ║   {coords}", coords = coords);
+
+	let frame_top = &format!("┌{:─^width$}┐", "", width = config::SIZE_X * 3);
+	let top = &format!(" {frame_top}  ║   {frame_top}", frame_top = frame_top);
+
+	let frame_bottom = &format!("└{:─^width$}┘", "", width = config::SIZE_X * 3);
+	let bottom = &format!(" {frame_bottom}  ║   {frame_bottom}", frame_bottom = frame_bottom);
 	let show_position = match round {
 		Round::One => false,
 		Round::Two => true,
 	};
 
-	let mut output = format!("{}{}{}\r\n{}{}\r\n", padding, color::Fg(color::White), coord_top, padding, frame_top);
-	for row in 0..10 {
+	let mut output = format!("{}{}{}\r\n{}{}\r\n", padding, color::Fg(color::White), coord_top, padding, top);
+	for row in 0..config::SIZE_Y {
 		output += &padding;
-		output += coord_dict[row];
+		output += &make_alphabetic(row);
 		output += "│";
 		output += &get_board_row(&board_me[row], row, pos_x, pos_y, Empty, false);
 		output += "│  ║  ";
-		output += coord_dict[row];
+		output += &make_alphabetic(row);
 		output += "│";
 		output += &get_board_row(&board_ai[row], row, pos_x, pos_y, Crosshair, show_position);
 		output += "│\r\n";
 	}
 	output += &padding;
-	output += frame_bottom;
+	output += bottom;
 	output += "\r\n\r\n";
 	output += &format!("{}", color::Fg(color::White));
 
 	output
 }
 
-pub fn get_coord(pos_x: usize, pos_y: usize) -> String {
-	let alphabet = ('A'..='J')
+fn make_alphabetic(y: usize) -> String {
+	let alphabet = ('A'..='Z')
 		.filter_map(|c| {
 			let c = c as char;
 			if c.is_alphabetic() {
@@ -178,7 +210,11 @@ pub fn get_coord(pos_x: usize, pos_y: usize) -> String {
 		})
 		.collect::<Vec<_>>();
 
-	format!("{}{}", alphabet[pos_y], pos_x + 1)
+	String::from(alphabet[y])
+}
+
+pub fn get_coord(pos_x: usize, pos_y: usize) -> String {
+	format!("{}{}", make_alphabetic(pos_y), pos_x + 1)
 }
 
 #[test]
@@ -193,12 +229,17 @@ fn get_coord_works() {
 
 pub fn get_round1_instructions() -> String {
 	let padding = get_padding();
+	let board_size = config::SIZE_X * 3 * 2;
+	let inner_size = ((board_size + 11 - 71) / 2) as f32;
+	let size = inner_size.floor() as usize;
+	let inner_padding = &format!("{:width$}", "", width = size);
+
 	format!(
-		"\r\n{}{}      PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
-		padding,
+		"\r\n{padding}{inner_padding}      {}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{padding}{inner_padding} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
 		color::Fg(color::Green),
 		color::Fg(color::White),
-		padding,
+		padding=padding,
+		inner_padding=inner_padding
 	)
 }
 

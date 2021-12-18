@@ -1,3 +1,4 @@
+use crate::config;
 use crate::Cell;
 use crate::Direction;
 use crate::Rotation;
@@ -5,13 +6,13 @@ use crate::Rotation;
 use Cell::{Crosshair, Empty, Placeholder, ShipOne, ShipThree, ShipTwo};
 
 pub fn move_ship(
-	mut board: [[Cell; 10]; 10],
+	mut board: config::Board,
 	mut pos_x: usize,
 	mut pos_y: usize,
 	ship_size: usize,
 	rotation: &Rotation,
 	direction: Direction,
-) -> ([[Cell; 10]; 10], usize, usize) {
+) -> (config::Board, usize, usize) {
 	match direction {
 		Direction::Left => {
 			if is_free_space(&board, pos_x as isize - 1, pos_y as isize, ship_size, rotation) {
@@ -56,89 +57,92 @@ pub fn move_ship(
 
 #[test]
 fn move_ship_works() {
-	let mut board = [[Empty; 10]; 10];
+	let limit_x = config::SIZE_X - 1;
+	let limit_y = config::SIZE_Y - 1;
+
+	let mut board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	let mut result = move_ship(board, 0, 0, 1, &Rotation::Horizontal, Direction::Right);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][1] = Placeholder;
 	assert_eq!(result, (board, 1, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	result = move_ship(board, 0, 0, 1, &Rotation::Horizontal, Direction::Left);
 	assert_eq!(result, (board, 0, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	result = move_ship(board, 0, 0, 1, &Rotation::Horizontal, Direction::Up);
 	assert_eq!(result, (board, 0, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	result = move_ship(board, 0, 0, 1, &Rotation::Horizontal, Direction::Down);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[1][0] = Placeholder;
 	assert_eq!(result, (board, 0, 1));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Placeholder;
 	result = move_ship(board, 5, 5, 1, &Rotation::Horizontal, Direction::Right);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][6] = Placeholder;
 	assert_eq!(result, (board, 6, 5));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Placeholder;
 	result = move_ship(board, 5, 5, 1, &Rotation::Horizontal, Direction::Left);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][4] = Placeholder;
 	assert_eq!(result, (board, 4, 5));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Placeholder;
 	result = move_ship(board, 5, 5, 1, &Rotation::Horizontal, Direction::Up);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[4][5] = Placeholder;
 	assert_eq!(result, (board, 5, 4));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Placeholder;
 	result = move_ship(board, 5, 5, 1, &Rotation::Horizontal, Direction::Down);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[6][5] = Placeholder;
 	assert_eq!(result, (board, 5, 6));
 
-	board = [[Empty; 10]; 10];
-	board[9][9] = Placeholder;
-	result = move_ship(board, 9, 9, 1, &Rotation::Horizontal, Direction::Right);
-	assert_eq!(result, (board, 9, 9));
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y][limit_y] = Placeholder;
+	result = move_ship(board, limit_x, limit_y, 1, &Rotation::Horizontal, Direction::Right);
+	assert_eq!(result, (board, limit_x, limit_y));
 
-	board = [[Empty; 10]; 10];
-	board[9][9] = Placeholder;
-	result = move_ship(board, 9, 9, 1, &Rotation::Horizontal, Direction::Left);
-	board = [[Empty; 10]; 10];
-	board[9][8] = Placeholder;
-	assert_eq!(result, (board, 8, 9));
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y][limit_x] = Placeholder;
+	result = move_ship(board, limit_x, limit_y, 1, &Rotation::Horizontal, Direction::Left);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y][limit_x - 1] = Placeholder;
+	assert_eq!(result, (board, limit_x - 1, limit_y));
 
-	board = [[Empty; 10]; 10];
-	board[9][9] = Placeholder;
-	result = move_ship(board, 9, 9, 1, &Rotation::Horizontal, Direction::Up);
-	board = [[Empty; 10]; 10];
-	board[8][9] = Placeholder;
-	assert_eq!(result, (board, 9, 8));
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y][limit_x] = Placeholder;
+	result = move_ship(board, limit_x, limit_y, 1, &Rotation::Horizontal, Direction::Up);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y - 1][limit_x] = Placeholder;
+	assert_eq!(result, (board, limit_x, limit_y - 1));
 
-	board = [[Empty; 10]; 10];
-	board[9][9] = Placeholder;
-	result = move_ship(board, 9, 9, 1, &Rotation::Horizontal, Direction::Down);
-	assert_eq!(result, (board, 9, 9));
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	board[limit_y][limit_x] = Placeholder;
+	result = move_ship(board, limit_x, limit_y, 1, &Rotation::Horizontal, Direction::Down);
+	assert_eq!(result, (board, limit_x, limit_y));
 }
 
 pub fn move_crosshair(
-	mut board: [[Cell; 10]; 10],
+	mut board: config::Board,
 	mut pos_x: usize,
 	mut pos_y: usize,
 	direction: Direction,
-) -> ([[Cell; 10]; 10], usize, usize) {
+) -> (config::Board, usize, usize) {
 	let bound_x = pos_x;
 	let bound_y = pos_y;
 	match direction {
@@ -201,91 +205,91 @@ pub fn move_crosshair(
 
 #[test]
 fn move_crosshair_works() {
-	let mut board = [[Empty; 10]; 10];
+	let mut board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Crosshair;
 	let mut result = move_crosshair(board, 0, 0, Direction::Right);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][1] = Crosshair;
 	assert_eq!(result, (board, 1, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Crosshair;
 	result = move_crosshair(board, 0, 0, Direction::Left);
 	assert_eq!(result, (board, 0, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Crosshair;
 	result = move_crosshair(board, 0, 0, Direction::Up);
 	assert_eq!(result, (board, 0, 0));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Crosshair;
 	result = move_crosshair(board, 0, 0, Direction::Down);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[1][0] = Crosshair;
 	assert_eq!(result, (board, 0, 1));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Crosshair;
 	result = move_crosshair(board, 5, 5, Direction::Right);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][6] = Crosshair;
 	assert_eq!(result, (board, 6, 5));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Crosshair;
 	result = move_crosshair(board, 5, 5, Direction::Left);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][4] = Crosshair;
 	assert_eq!(result, (board, 4, 5));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Crosshair;
 	result = move_crosshair(board, 5, 5, Direction::Up);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[4][5] = Crosshair;
 	assert_eq!(result, (board, 5, 4));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[5][5] = Crosshair;
 	result = move_crosshair(board, 5, 5, Direction::Down);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[6][5] = Crosshair;
 	assert_eq!(result, (board, 5, 6));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[9][9] = Crosshair;
 	result = move_crosshair(board, 9, 9, Direction::Right);
 	assert_eq!(result, (board, 9, 9));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[9][9] = Crosshair;
 	result = move_crosshair(board, 9, 9, Direction::Left);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[9][8] = Crosshair;
 	assert_eq!(result, (board, 8, 9));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[9][9] = Crosshair;
 	result = move_crosshair(board, 9, 9, Direction::Up);
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[8][9] = Crosshair;
 	assert_eq!(result, (board, 9, 8));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[9][9] = Crosshair;
 	result = move_crosshair(board, 9, 9, Direction::Down);
 	assert_eq!(result, (board, 9, 9));
 }
 
 pub fn place_entity(
-	mut board: [[Cell; 10]; 10],
+	mut board: config::Board,
 	pos_x: usize,
 	pos_y: usize,
 	ship_size: usize,
 	rotation: &Rotation,
 	cell: Cell,
-) -> [[Cell; 10]; 10] {
+) -> config::Board {
 	let mut coords: Vec<u8> = vec![];
 
 	match rotation {
@@ -337,37 +341,37 @@ pub fn place_entity(
 
 #[test]
 fn place_entity_works() {
-	let mut result = place_entity([[Empty; 10]; 10], 0, 0, 1, &Rotation::Horizontal, Placeholder);
-	let mut board = [[Empty; 10]; 10];
+	let mut result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 1, &Rotation::Horizontal, Placeholder);
+	let mut board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	assert_eq!(result, board);
 
-	result = place_entity([[Empty; 10]; 10], 0, 0, 2, &Rotation::Horizontal, Placeholder);
-	board = [[Empty; 10]; 10];
+	result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 2, &Rotation::Horizontal, Placeholder);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	board[0][1] = Placeholder;
 	assert_eq!(result, board);
 
-	result = place_entity([[Empty; 10]; 10], 0, 0, 3, &Rotation::Horizontal, Placeholder);
-	board = [[Empty; 10]; 10];
+	result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 3, &Rotation::Horizontal, Placeholder);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	board[0][1] = Placeholder;
 	board[0][2] = Placeholder;
 	assert_eq!(result, board);
 
-	result = place_entity([[Empty; 10]; 10], 0, 0, 1, &Rotation::Vertical, Placeholder);
-	board = [[Empty; 10]; 10];
+	result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 1, &Rotation::Vertical, Placeholder);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	assert_eq!(result, board);
 
-	result = place_entity([[Empty; 10]; 10], 0, 0, 2, &Rotation::Vertical, Placeholder);
-	board = [[Empty; 10]; 10];
+	result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 2, &Rotation::Vertical, Placeholder);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	board[1][0] = Placeholder;
 	assert_eq!(result, board);
 
-	result = place_entity([[Empty; 10]; 10], 0, 0, 3, &Rotation::Vertical, Placeholder);
-	board = [[Empty; 10]; 10];
+	result = place_entity([[Empty; config::SIZE_X]; config::SIZE_Y], 0, 0, 3, &Rotation::Vertical, Placeholder);
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[0][0] = Placeholder;
 	board[1][0] = Placeholder;
 	board[2][0] = Placeholder;
@@ -375,7 +379,7 @@ fn place_entity_works() {
 }
 
 pub fn is_free_space(
-	board: &[[Cell; 10]; 10],
+	board: &config::Board,
 	temp_pos_x: isize,
 	temp_pos_y: isize,
 	ship_size: usize,
@@ -383,7 +387,11 @@ pub fn is_free_space(
 ) -> bool {
 	let mut result = true;
 
-	if temp_pos_x < 0 || temp_pos_y < 0 || temp_pos_x > 9 || temp_pos_y > 9 {
+	if temp_pos_x < 0
+		|| temp_pos_y < 0
+		|| temp_pos_x > (config::SIZE_X as isize - 1)
+		|| temp_pos_y > (config::SIZE_Y as isize - 1)
+	{
 		return false;
 	}
 
@@ -394,7 +402,10 @@ pub fn is_free_space(
 		Rotation::Horizontal => {
 			for offset in 0..ship_size {
 				let new_pos_x = pos_x + offset;
-				if new_pos_x > 9 || pos_y > 9 || board[pos_y][new_pos_x] != Empty && board[pos_y][new_pos_x] != Placeholder {
+				if new_pos_x > (config::SIZE_X - 1)
+					|| pos_y > (config::SIZE_Y - 1)
+					|| board[pos_y][new_pos_x] != Empty && board[pos_y][new_pos_x] != Placeholder
+				{
 					result = false;
 					break;
 				}
@@ -403,7 +414,10 @@ pub fn is_free_space(
 		Rotation::Vertical => {
 			for offset in 0..ship_size {
 				let new_pos_y = pos_y + offset;
-				if pos_x > 9 || new_pos_y > 9 || board[new_pos_y][pos_x] != Empty && board[new_pos_y][pos_x] != Placeholder {
+				if pos_x > (config::SIZE_X - 1)
+					|| new_pos_y > (config::SIZE_Y - 1)
+					|| board[new_pos_y][pos_x] != Empty && board[new_pos_y][pos_x] != Placeholder
+				{
 					result = false;
 					break;
 				}
@@ -416,7 +430,7 @@ pub fn is_free_space(
 
 #[test]
 fn is_free_space_works() {
-	let mut board = [[Empty; 10]; 10];
+	let mut board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[1][0] = Cell::Ship;
 	board[2][1] = Cell::Ship;
 	assert_eq!(is_free_space(&board, 0, 0, 2, &Rotation::Vertical), false);
@@ -430,7 +444,7 @@ fn is_free_space_works() {
 	assert_eq!(is_free_space(&board, 2, 0, 3, &Rotation::Vertical), true);
 	assert_eq!(is_free_space(&board, 0, 2, 1, &Rotation::Vertical), true);
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	for x in 0..10 {
 		for y in 0..10 {
 			assert_eq!(is_free_space(&board, x, y, 1, &Rotation::Vertical), true);
@@ -439,11 +453,7 @@ fn is_free_space_works() {
 	}
 }
 
-pub fn get_next_available_coordinates(
-	board: &[[Cell; 10]; 10],
-	ship_size: usize,
-	rotation: &Rotation,
-) -> (usize, usize) {
+pub fn get_next_available_coordinates(board: &config::Board, ship_size: usize, rotation: &Rotation) -> (usize, usize) {
 	let mut pos_x = 0;
 	let mut pos_y = 0;
 
@@ -474,7 +484,7 @@ pub fn get_next_available_coordinates(
 
 #[test]
 fn get_next_available_coordinates_works() {
-	let mut board = [[Empty; 10]; 10];
+	let mut board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	assert_eq!(get_next_available_coordinates(&board, 1, &Rotation::Vertical), (0, 0));
 
 	board[0][0] = Cell::Ship;
@@ -486,7 +496,7 @@ fn get_next_available_coordinates_works() {
 	board[1][0] = Cell::Ship;
 	assert_eq!(get_next_available_coordinates(&board, 1, &Rotation::Vertical), (1, 1));
 
-	board = [[Empty; 10]; 10];
+	board = [[Empty; config::SIZE_X]; config::SIZE_Y];
 	board[1][0] = Cell::Ship;
 	assert_eq!(get_next_available_coordinates(&board, 2, &Rotation::Vertical), (1, 0));
 }

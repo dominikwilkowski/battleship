@@ -1,8 +1,16 @@
+use crate::Cell;
 use crate::Ship;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-// SIZE
+// BOARD SIZE
+// MUST BE >10
+pub const SIZE_X: usize = 10;
+pub const SIZE_Y: usize = 10;
+pub type BoardRow = [Cell; SIZE_X];
+pub type Board = [BoardRow; SIZE_Y];
+
+// MIN TERMINAL SIZE
 pub const MIN_WIDTH: u16 = 80;
 pub const MIN_HEIGHT: u16 = 35;
 

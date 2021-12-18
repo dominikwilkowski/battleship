@@ -1,3 +1,4 @@
+use crate::config;
 use crate::Cell;
 
 #[derive(Debug, PartialEq)]
@@ -7,7 +8,7 @@ pub enum HitType {
 	Miss,
 }
 
-pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
+pub fn get_score(board: &config::Board) -> String {
 	let mut score = 0;
 
 	for row in board {
@@ -23,7 +24,7 @@ pub fn get_score(board: &[[Cell; 10]; 10]) -> String {
 
 #[test]
 fn get_score_works() {
-	let mut board = [[Cell::Empty; 10]; 10];
+	let mut board = [[Cell::Empty; config::SIZE_X]; config::SIZE_Y];
 	assert_eq!(get_score(&board), String::from("00"));
 	board[0][0] = Cell::ShipTwo([0, 0, 0, 0]);
 	assert_eq!(get_score(&board), String::from("00"));
@@ -60,12 +61,7 @@ fn get_score_works() {
 	assert_eq!(get_score(&board), String::from("10"));
 }
 
-pub fn get_hit_type(
-	board_damage: &[[Cell; 10]; 10],
-	board_ships: &[[Cell; 10]; 10],
-	pos_x: usize,
-	pos_y: usize,
-) -> HitType {
+pub fn get_hit_type(board_damage: &config::Board, board_ships: &config::Board, pos_x: usize, pos_y: usize) -> HitType {
 	let mut result = HitType::Miss;
 
 	match board_ships[pos_y][pos_x] {
@@ -111,7 +107,7 @@ pub fn get_hit_type(
 
 #[test]
 fn hit_type_works() {
-	let mut board = [[Cell::Empty; 10]; 10];
+	let mut board = [[Cell::Empty; config::SIZE_X]; config::SIZE_Y];
 	assert_eq!(get_hit_type(&board, &board, 0, 0), HitType::Miss);
 	board[0][0] = Cell::ShipOne([0, 0]);
 	assert_eq!(get_hit_type(&board, &board, 0, 0), HitType::HitNSunk);
@@ -132,8 +128,8 @@ fn hit_type_works() {
 	assert_eq!(get_hit_type(&board, &board, 1, 1), HitType::Miss);
 	assert_eq!(get_hit_type(&board, &board, 5, 5), HitType::HitNSunk);
 
-	board = [[Cell::Empty; 10]; 10];
-	let mut board_secret = [[Cell::Empty; 10]; 10];
+	board = [[Cell::Empty; config::SIZE_X]; config::SIZE_Y];
+	let mut board_secret = [[Cell::Empty; config::SIZE_X]; config::SIZE_Y];
 	board_secret[5][5] = Cell::ShipThree([5, 5, 5, 6, 5, 7]);
 	board_secret[6][5] = Cell::ShipThree([5, 5, 5, 6, 5, 7]);
 	board_secret[7][5] = Cell::ShipThree([5, 5, 5, 6, 5, 7]);

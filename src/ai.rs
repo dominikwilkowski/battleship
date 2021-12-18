@@ -10,7 +10,7 @@ use crate::Rotation;
 use rand::Rng;
 use ships::ShipTracker;
 
-pub fn set_ships(mut board: [[Cell; 10]; 10]) -> [[Cell; 10]; 10] {
+pub fn set_ships(mut board: config::Board) -> config::Board {
 	let mut ships =
 		ShipTracker::new(config::SHIP_ONE_BLOCK_AMOUNT, config::SHIP_TWO_BLOCK_AMOUNT, config::SHIP_THREE_BLOCK_AMOUNT);
 	let (one_block, two_block, three_block) = ships.get_ships();
@@ -47,7 +47,7 @@ pub fn set_ships(mut board: [[Cell; 10]; 10]) -> [[Cell; 10]; 10] {
 #[test]
 fn set_ships_works() {
 	let mut ships = 0;
-	let board = set_ships([[Cell::Empty; 10]; 10]);
+	let board = set_ships([[Cell::Empty; config::SIZE_X]; config::SIZE_Y]);
 	for row in board {
 		for cell in row {
 			match cell {
@@ -77,7 +77,7 @@ impl Attack {
 		}
 	}
 
-	pub fn shoot(&mut self, board: &[[Cell; 10]; 10]) -> (usize, usize) {
+	pub fn shoot(&mut self, board: &config::Board) -> (usize, usize) {
 		let mut pos_x: usize = 0;
 		let mut pos_y: usize = 0;
 
@@ -103,7 +103,7 @@ impl Attack {
 		(pos_x, pos_y)
 	}
 
-	pub fn shoot_after_hit(&mut self, board: &[[Cell; 10]; 10]) -> (usize, usize) {
+	pub fn shoot_after_hit(&mut self, board: &config::Board) -> (usize, usize) {
 		let mut possible_shots: Vec<[usize; 2]> = vec![];
 
 		let (last_x, last_y, _) = &self.history[self.history.len() - 1];
@@ -182,7 +182,7 @@ impl Attack {
 #[test]
 fn attack_works() {
 	let mut attack = Attack::new();
-	let mut board = [[Cell::Shot; 10]; 10];
+	let mut board = [[Cell::Shot; config::SIZE_X]; config::SIZE_X];
 
 	board[5][5] = Cell::ShipThree([5, 5, 5, 4, 5, 3]);
 	assert_eq!(attack.shoot(&board), (5, 5));

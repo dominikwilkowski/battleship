@@ -61,9 +61,9 @@ fn main() {
 	let mut stdout = stdout().into_raw_mode().unwrap();
 
 	// our boards
-	let mut board_me = [[Empty; 10]; 10];
-	let mut board_ai = [[Empty; 10]; 10];
-	let mut board_secret = [[Empty; 10]; 10];
+	let mut board_me = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	let mut board_ai = [[Empty; config::SIZE_X]; config::SIZE_Y];
+	let mut board_secret = [[Empty; config::SIZE_X]; config::SIZE_Y];
 
 	let mut history = History::new();
 
@@ -183,7 +183,14 @@ fn main() {
 				rotation = Rotation::Horizontal;
 				pos_x = 0;
 				pos_y = 0;
-				board_me = movement::place_entity([[Empty; 10]; 10], pos_x, pos_y, ship_size, &rotation, Placeholder);
+				board_me = movement::place_entity(
+					[[Empty; config::SIZE_X]; config::SIZE_Y],
+					pos_x,
+					pos_y,
+					ship_size,
+					&rotation,
+					Placeholder,
+				);
 			}
 			_ => {}
 		}
@@ -352,7 +359,7 @@ fn main() {
 				}
 			}
 			Key::Right => {
-				if pos_x < 9 {
+				if pos_x < (config::SIZE_X - 1) {
 					pos_x += 1;
 				}
 			}
@@ -362,7 +369,7 @@ fn main() {
 				}
 			}
 			Key::Down => {
-				if pos_y < 9 {
+				if pos_y < (config::SIZE_Y - 1) {
 					pos_y += 1;
 				}
 			}
