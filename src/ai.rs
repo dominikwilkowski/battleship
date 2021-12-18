@@ -19,8 +19,8 @@ pub fn set_ships(mut board: config::Board) -> config::Board {
 	let mut ship_size = config::get_entitie_size(&this_ship);
 
 	while remaining_ships > 0 {
-		let pos_x: usize = rand::thread_rng().gen_range(0..10);
-		let pos_y: usize = rand::thread_rng().gen_range(0..10);
+		let pos_x: usize = rand::thread_rng().gen_range(0..config::SIZE_X);
+		let pos_y: usize = rand::thread_rng().gen_range(0..config::SIZE_Y);
 		let rotation = match rand::thread_rng().gen_range(0..=1) {
 			0 => Rotation::Horizontal,
 			_ => Rotation::Vertical,
@@ -89,8 +89,8 @@ impl Attack {
 			let mut valid_shot = false;
 
 			while !valid_shot {
-				pos_x = rand::thread_rng().gen_range(0..10);
-				pos_y = rand::thread_rng().gen_range(0..10);
+				pos_x = rand::thread_rng().gen_range(0..config::SIZE_X);
+				pos_y = rand::thread_rng().gen_range(0..config::SIZE_Y);
 
 				if board[pos_y][pos_x] != Cell::Shot && board[pos_y][pos_x] != Cell::Damage {
 					valid_shot = true;
@@ -109,16 +109,21 @@ impl Attack {
 		let (last_x, last_y, _) = &self.history[self.history.len() - 1];
 		let (before_x, before_y, before_hit) = &self.history[self.history.len() - 2];
 
+		let max_x = config::SIZE_X - 2;
+		let max_y = config::SIZE_Y - 2;
+
 		// we know last_hit was a HitType::Hit so we check if there is a direction already apparent
 		if before_hit == &game::HitType::Hit {
 			if *before_x == *last_x {
-				if *last_y < 8 && board[*last_y + 1][*last_x] != Cell::Shot && board[*last_y + 1][*last_x] != Cell::Damage {
+				if *last_y < max_y && board[*last_y + 1][*last_x] != Cell::Shot && board[*last_y + 1][*last_x] != Cell::Damage {
 					possible_shots.push([*last_x, *last_y + 1]);
 				}
 				if *last_y > 0 && board[*last_y - 1][*last_x] != Cell::Shot && board[*last_y - 1][*last_x] != Cell::Damage {
 					possible_shots.push([*last_x, *last_y - 1]);
 				}
-				if *before_y < 8 && board[*before_y + 1][*last_x] != Cell::Shot && board[*before_y + 1][*last_x] != Cell::Damage
+				if *before_y < max_y
+					&& board[*before_y + 1][*last_x] != Cell::Shot
+					&& board[*before_y + 1][*last_x] != Cell::Damage
 				{
 					possible_shots.push([*last_x, *before_y + 1]);
 				}
@@ -127,13 +132,15 @@ impl Attack {
 					possible_shots.push([*last_x, *before_y - 1]);
 				}
 			} else {
-				if *last_x < 8 && board[*last_y][*last_x + 1] != Cell::Shot && board[*last_y][*last_x + 1] != Cell::Damage {
+				if *last_x < max_x && board[*last_y][*last_x + 1] != Cell::Shot && board[*last_y][*last_x + 1] != Cell::Damage {
 					possible_shots.push([*last_x + 1, *last_y]);
 				}
 				if *last_x > 0 && board[*last_y][*last_x - 1] != Cell::Shot && board[*last_y][*last_x - 1] != Cell::Damage {
 					possible_shots.push([*last_x - 1, *last_y]);
 				}
-				if *before_x < 8 && board[*last_y][*before_x + 1] != Cell::Shot && board[*last_y][*before_x + 1] != Cell::Damage
+				if *before_x < max_x
+					&& board[*last_y][*before_x + 1] != Cell::Shot
+					&& board[*last_y][*before_x + 1] != Cell::Damage
 				{
 					possible_shots.push([*before_x + 1, *last_y]);
 				}
@@ -143,13 +150,13 @@ impl Attack {
 				}
 			}
 		} else {
-			if *last_x < 8 && board[*last_y][*last_x + 1] != Cell::Shot && board[*last_y][*last_x + 1] != Cell::Damage {
+			if *last_x < max_x && board[*last_y][*last_x + 1] != Cell::Shot && board[*last_y][*last_x + 1] != Cell::Damage {
 				possible_shots.push([*last_x + 1, *last_y]);
 			}
 			if *last_x > 0 && board[*last_y][*last_x - 1] != Cell::Shot && board[*last_y][*last_x - 1] != Cell::Damage {
 				possible_shots.push([*last_x - 1, *last_y]);
 			}
-			if *last_y < 8 && board[*last_y + 1][*last_x] != Cell::Shot && board[*last_y + 1][*last_x] != Cell::Damage {
+			if *last_y < max_y && board[*last_y + 1][*last_x] != Cell::Shot && board[*last_y + 1][*last_x] != Cell::Damage {
 				possible_shots.push([*last_x, *last_y + 1]);
 			}
 			if *last_y > 0 && board[*last_y - 1][*last_x] != Cell::Shot && board[*last_y - 1][*last_x] != Cell::Damage {
@@ -157,32 +164,29 @@ impl Attack {
 			}
 		}
 
-		let index: usize = if !possible_shots.is_empty() {
-			rand::thread_rng().gen_range(0..possible_shots.len())
+		let (next_x, next_y) = if !possible_shots.is_empty() {
+			let index = rand::thread_rng().gen_range(0..possible_shots.len());
+			(possible_shots[index][0], possible_shots[index][1])
 		} else {
-			0
+			self.shoot(board)
 		};
 
-		self.history.push((
-			possible_shots[index][0],
-			possible_shots[index][1],
-			game::get_hit_type(board, board, possible_shots[index][0], possible_shots[index][1]),
-		));
+		self.history.push((next_x, next_y, game::get_hit_type(board, board, next_x, next_y)));
 
-		if game::get_hit_type(board, board, possible_shots[index][0], possible_shots[index][1]) == game::HitType::Miss {
+		if game::get_hit_type(board, board, next_x, next_y) == game::HitType::Miss {
 			for coords in &possible_shots {
 				self.todo.push((coords[0], coords[1]));
 			}
 		}
 
-		(possible_shots[index][0], possible_shots[index][1])
+		(next_x, next_y)
 	}
 }
 
 #[test]
 fn attack_works() {
 	let mut attack = Attack::new();
-	let mut board = [[Cell::Shot; config::SIZE_X]; config::SIZE_X];
+	let mut board = [[Cell::Shot; config::SIZE_X]; config::SIZE_Y];
 
 	board[5][5] = Cell::ShipThree([5, 5, 5, 4, 5, 3]);
 	assert_eq!(attack.shoot(&board), (5, 5));

@@ -4,8 +4,9 @@ use crate::Ship;
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 // BOARD SIZE
-// MUST BE >10
+// MUST BE >8
 pub const SIZE_X: usize = 10;
+// MUST BE >3
 pub const SIZE_Y: usize = 10;
 pub type BoardRow = [Cell; SIZE_X];
 pub type Board = [BoardRow; SIZE_Y];

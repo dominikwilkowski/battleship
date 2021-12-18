@@ -228,18 +228,17 @@ fn get_coord_works() {
 }
 
 pub fn get_round1_instructions() -> String {
-	let padding = get_padding();
+	let padding = get_padding().len();
 	let board_size = config::SIZE_X * 3 * 2;
-	let inner_size = ((board_size + 11 - 71) / 2) as f32;
-	let size = inner_size.floor() as usize;
-	let inner_padding = &format!("{:width$}", "", width = size);
+	let all_size = (((padding * 2) + board_size + 11 - 71) / 2) as f32;
+	let size = all_size.floor() as usize;
+	let all_padding = &format!("{:width$}", "", width = size);
 
 	format!(
-		"\r\n{padding}{inner_padding}      {}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{padding}{inner_padding} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
+		"\r\n{all_padding}      {}PLACING ROUND - Place your ships strategically on your map{}\r\n\r\n{all_padding} [←↑↓→] position ║ [r] rotate ║ [enter] place ║ [del] restart ║ [q] quit\r\n\r\n",
 		color::Fg(color::Green),
 		color::Fg(color::White),
-		padding=padding,
-		inner_padding=inner_padding
+		all_padding=all_padding,
 	)
 }
 
